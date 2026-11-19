@@ -51,9 +51,11 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv("PUBCHECK_CONFIG", str(tmp_path / "config.toml"))
     monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
     monkeypatch.setattr(s, "ACQUAINT_CANDIDATES", ())  # no acquaint: the vocabulary is the file's
-    import pubcheck.core as core
-    if not d.dictionary_words():  # a runner with no word list: unattended checks need one
-        monkeypatch.setattr(core, "dictionary_words", lambda: frozenset({"word"}))
+    # the same small word list everywhere (a CI runner has none; unattended checks need one)
+    (tmp_path / "words").write_text("candidate\nmiles\nword\n")
+    monkeypatch.setenv(d.DICTIONARY_ENV, str(tmp_path / "words"))
+    d.dictionary_words.cache_clear()
+    d._term_pattern.cache_clear()
 
     def set_visibility(slug, private, *, age=0):
         remote = f"git@github.com:{slug}.git"
@@ -102,7 +104,7 @@ def test_private_refs_and_session_links():
                  "octo/_app#3", "~/work/proj/t/x"]:
         assert cats(text, **mine) == {"private-ref"}, text
     assert cats("octo/_app#3 and $PP/_agent_work") == set()  # not configured: not known
-    for text in ["File /home/runner/work/acquaint/x.py", "/Users/runner/work", "/root/.cache/pip"]:
+    for text in ["File /home/zz-someone/work/acquaint/x.py", "/Users/zz-someone/work", "/root/.cache/pip"]:
         assert cats(text) == set(), text
     link = "https://claude.ai/code/session_01ABC"
     assert cats(link) == {"session-link"}

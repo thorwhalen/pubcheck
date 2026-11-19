@@ -33,6 +33,7 @@ and the log never holds it). A credential's term is its pattern name, never the 
 from __future__ import annotations
 
 import getpass
+import os
 import re
 from collections.abc import Callable, Iterable, Mapping
 from functools import lru_cache
@@ -42,6 +43,7 @@ Finding = tuple[str, str]
 Detector = Callable[[str, Mapping], list]
 
 DICTIONARY = "/usr/share/dict/words"
+DICTIONARY_ENV = "PUBCHECK_DICTIONARY"  # another word list, one word per line
 STOP_WORDS = frozenset(
     "admin bot candidate client contact dev hello info operator owner support team user".split()
 )
@@ -100,7 +102,7 @@ def _local_paths():
 def dictionary_words() -> frozenset:
     """Lowercased words of the system dictionary; empty when the machine has none."""
     try:
-        with open(DICTIONARY, encoding="utf-8", errors="ignore") as f:
+        with open(os.environ.get(DICTIONARY_ENV) or DICTIONARY, encoding="utf-8", errors="ignore") as f:
             return frozenset(w.strip().lower() for w in f)
     except OSError:
         return frozenset()
