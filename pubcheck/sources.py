@@ -215,7 +215,7 @@ def vocabulary(*, budget: Budget):
     old = None
     try:
         old = json.loads(cache.read_text())
-        if 0 <= time.time() - old["checked_at"] < VOCAB_TTL:
+        if 0 <= time.time() - old["checked_at"] < VOCAB_TTL and old["vocabulary"]:
             return old["vocabulary"], True
     except (OSError, ValueError, KeyError, TypeError):
         pass
@@ -227,8 +227,10 @@ def vocabulary(*, budget: Budget):
         except (KeyError, TypeError):
             rows = None
         return (rows, True) if rows else ([], False)
+    if not fresh:
+        return [], False  # never cached: an empty answer is no registry
     write_private(cache, json.dumps({"checked_at": time.time(), "vocabulary": fresh}))
-    return fresh, bool(fresh)
+    return fresh, True
 
 
 def terms_for(vocab, repo):

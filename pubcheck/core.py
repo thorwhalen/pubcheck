@@ -30,7 +30,13 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from pubcheck.base import MAX_TEXT, Budget, log_event, settings, text_hash
-from pubcheck.detectors import DETECTORS, UNATTENDED_DETECTORS, Finding, findings
+from pubcheck.detectors import (
+    DETECTORS,
+    UNATTENDED_DETECTORS,
+    Finding,
+    dictionary_words,
+    findings,
+)
 from pubcheck.sources import (
     cached_visibility,
     companion_exists,
@@ -130,6 +136,16 @@ def destination(repo: str, cache: dict, *, budget: Budget, config: Mapping | Non
     return "a private repo"
 
 
+def _unattended_gaps(conf: Mapping) -> list[str]:
+    """What an unattended check needs and lacks: the operator's settings, a word list."""
+    gaps = []
+    if not conf.get("private_owner"):
+        gaps.append("no private_owner setting (the operator's config file is missing)")
+    if not dictionary_words():
+        gaps.append("no system word list (install one, e.g. the wamerican package)")
+    return gaps
+
+
 def check(
     text: str,
     *,
@@ -193,6 +209,11 @@ def check(
             verdict.visibility = "private"
             return verdict
         verdict.visibility = "public" if private is False else "unknown"
+        missing = _unattended_gaps(conf) if unattended else []
+        if missing:
+            verdict.decision = "unavailable"
+            verdict.reason = "not set up for an unattended writer: " + "; ".join(missing)
+            return logged("unavailable", reason=verdict.reason)
         if unattended and sum(len(t) for t in texts) > MAX_TEXT:
             verdict.decision = "unavailable"
             verdict.reason = f"the text is longer than {MAX_TEXT} characters, which is not checked"

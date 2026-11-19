@@ -51,6 +51,9 @@ def env(tmp_path, monkeypatch):
     monkeypatch.setenv("PUBCHECK_CONFIG", str(tmp_path / "config.toml"))
     monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
     monkeypatch.setattr(s, "ACQUAINT_CANDIDATES", ())  # no acquaint: the vocabulary is the file's
+    import pubcheck.core as core
+    if not d.dictionary_words():  # a runner with no word list: unattended checks need one
+        monkeypatch.setattr(core, "dictionary_words", lambda: frozenset({"word"}))
 
     def set_visibility(slug, private, *, age=0):
         remote = f"git@github.com:{slug}.git"
@@ -188,6 +191,25 @@ def test_empty_or_old_registry_is_unavailable(env, monkeypatch):
     assert check("Fixed it.", repo=PUBLIC, public=True, unattended=True).decision == "unavailable"
     cache.write_text(json.dumps({"checked_at": time.time() - s.VOCAB_TTL - 5, "vocabulary": VOCAB}))
     assert check("Ada Quill", repo=PUBLIC, public=True, unattended=True).decision == "flag"  # young enough
+
+
+def test_unattended_needs_the_operator_config_and_a_word_list(env, monkeypatch):
+    import pubcheck.core as core
+    monkeypatch.setenv("PUBCHECK_CONFIG", str(env.root / "none.toml"))
+    v = check("Fixed.", repo=PUBLIC, public=True, unattended=True)
+    assert v.decision == "unavailable" and "private_owner" in v.reason
+    assert check("Fixed.", repo=PUBLIC, public=True).decision == "pass"  # attended: fine
+    monkeypatch.setenv("PUBCHECK_CONFIG", str(env.root / "config.toml"))
+    monkeypatch.setattr(core, "dictionary_words", lambda: frozenset())
+    assert "word list" in check("Fixed.", repo=PUBLIC, public=True, unattended=True).reason
+
+
+def test_an_empty_cached_vocabulary_is_not_trusted(env, monkeypatch):
+    monkeypatch.delenv(s.VOCAB_FILE_ENV)
+    cache = env.root / "cache" / "vocabulary.json"
+    cache.parent.mkdir(parents=True)
+    cache.write_text(json.dumps({"checked_at": time.time(), "vocabulary": []}))
+    assert s.vocabulary(budget=__import__("pubcheck.base").base.Budget(1)) == ([], False)
 
 
 def test_unattended_ignores_override_and_caps_length(env):

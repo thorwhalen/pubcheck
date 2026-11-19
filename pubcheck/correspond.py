@@ -52,11 +52,12 @@ def _repo_of(ref: Any) -> str | None:
 
 
 def _strings(value: Any) -> list[str]:
+    """The text values in plain data (strings and numbers, through mappings and lists); objects are skipped."""
     if isinstance(value, Mapping):
         return [s for v in value.values() for s in _strings(v)]
     if isinstance(value, (list, tuple, set)):
         return [s for v in value for s in _strings(v)]
-    return [] if value is None else [str(value)]
+    return [str(value)] if isinstance(value, (str, int, float)) and not isinstance(value, bool) else []
 
 
 def _published_with(draft: Any) -> list[str]:
@@ -92,11 +93,12 @@ def make_before_send(
 
         text = getattr(draft, "text", None) or ""
         title = getattr(draft, "title", None)
+        more = _published_with(draft)
         target = str(getattr(ref, "encoded", None) or ref)
         verdict = check(
             text,
             title=title,
-            more=_published_with(draft),
+            more=more,
             repo=_repo_of(ref),
             public=True,
             unattended=True,
@@ -115,7 +117,7 @@ def make_before_send(
         if dry_run:
             details["desk_item"] = "not filed (dry run)"
         else:
-            filed = hold(verdict, target=target, text=text, title=title, config=config)
+            filed = hold(verdict, target=target, text=text, title=title, more=more, config=config)
             details["desk_item"] = filed.get("url") or f"not filed: {filed.get('reason')}"
         why = (
             f"held for review: {', '.join(verdict.categories)} in a post to a public audience"

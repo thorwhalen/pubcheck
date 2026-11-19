@@ -18,8 +18,9 @@ text's hash, and an open issue with that hash is reused.
 
 from __future__ import annotations
 
+import re
 import shutil
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 
 from pubcheck.base import Budget, settings, text_hash
 from pubcheck.core import HINTS, Verdict
@@ -28,10 +29,21 @@ from pubcheck.sources import gh_repo_view
 MARKER = "pubcheck-hold"
 
 
+#: A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).
+PEM_BLOCK = re.compile(
+    r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(?:-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S
+)
+
+
 def redact(text: str) -> str:
-    """``text`` with every credential-shaped string replaced by its pattern's name."""
+    r"""``text`` with every credential-shaped string replaced by its pattern's name.
+
+    >>> redact("a -----BEGIN RSA PRIVATE KEY-----\nMIIE\nxyz\n-----END RSA PRIVATE KEY----- b")
+    'a [credential redacted: private_key_block] b'
+    """
     from openloops.egress import CREDENTIAL_PATTERNS
 
+    text = PEM_BLOCK.sub("[credential redacted: private_key_block]", text)
     for name, pattern in CREDENTIAL_PATTERNS:
         text = pattern.sub(f"[credential redacted: {name}]", text)
     return text
@@ -52,7 +64,9 @@ def hold_key(verdict: Verdict, target: str) -> str:
     return text_hash(target, verdict.text_hash)
 
 
-def hold_body(verdict: Verdict, *, target: str, text: str, title: str | None) -> str:
+def hold_body(
+    verdict: Verdict, *, target: str, text: str, title: str | None, more: Sequence[str] = ()
+) -> str:
     """The desk item's body: why it was held, what would have been published, and the key."""
     why = (
         [f"- {c}: {HINTS.get(c, c)}" for c in verdict.categories]
@@ -60,6 +74,7 @@ def hold_body(verdict: Verdict, *, target: str, text: str, title: str | None) ->
         else [f"- the check was unavailable: {verdict.reason}"]
     )
     text, title = redact(text), redact(title) if title else title
+    also = [f"**Also published with it:** {', '.join(redact(m) for m in more)}", ""] if more else []
     return "\n".join(
         [
             f"A post to `{target}` ({verdict.visibility}) was held by the publication check, "
@@ -73,6 +88,7 @@ def hold_body(verdict: Verdict, *, target: str, text: str, title: str | None) ->
             "",
             f"**Title:** {title or '(none)'}",
             "",
+            *also,
             "**Text:**",
             "",
             "````",
@@ -102,6 +118,7 @@ def file_hold(
     target: str,
     text: str,
     title: str | None = None,
+    more: Sequence[str] = (),
     config: Mapping | None = None,
     budget: Budget | None = None,
 ) -> dict:
@@ -123,7 +140,7 @@ def file_hold(
         url = _existing(repo, hold_key(verdict, target), budget)
         if url:
             return {"filed": True, "url": url, "repo": repo, "existing": True}
-        body = hold_body(verdict, target=target, text=text, title=title)
+        body = hold_body(verdict, target=target, text=text, title=title, more=more)
         argv = ["gh", "issue", "create", "-R", repo, "--title", hold_title(target, title),
                 "--body-file", "-"]
         if label:
