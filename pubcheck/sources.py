@@ -35,7 +35,9 @@ VISIBILITY_CACHE_ENV = "PRIV_VISIBILITY_CACHE_DIR"  # the shared cache's own nam
 VISIBILITY_TTL = 24 * 60 * 60
 VOCAB_FILE_ENV = "PUBLIC_TEXT_GUARD_VOCAB_FILE"
 VOCAB_TTL = 60 * 60
-VOCAB_MAX_AGE = 7 * 24 * 60 * 60  # an old copy serves when acquaint cannot answer, up to this age
+VOCAB_MAX_AGE = (
+    7 * 24 * 60 * 60
+)  # an old copy serves when acquaint cannot answer, up to this age
 COMPANION_TTL = 24 * 60 * 60
 ACQUAINT_CANDIDATES = ("~/.pyenv/shims/acquaint", "~/.local/bin/acquaint")
 PUBLIC_AUDIENCE = '{"scope": "public"}'
@@ -93,7 +95,9 @@ def gh_repo_view(slug, *, budget: Budget):
     """``True`` private, ``False`` public, ``"missing"`` no such repo, ``None`` unknown."""
     if not shutil.which("gh"):
         return None
-    r = budget.run(["gh", "repo", "view", slug, "--json", "isPrivate", "-q", ".isPrivate"])
+    r = budget.run(
+        ["gh", "repo", "view", slug, "--json", "isPrivate", "-q", ".isPrivate"]
+    )
     if r is None:
         return None
     if r.returncode == 0:
@@ -110,7 +114,12 @@ def write_visibility(slug, is_private, remote=None):
         tmp = d / f"{cache_key(remote)}.json.tmp"
         tmp.write_text(
             json.dumps(
-                {"remote": remote, "slug": slug, "is_private": is_private, "checked_at": time.time()}
+                {
+                    "remote": remote,
+                    "slug": slug,
+                    "is_private": is_private,
+                    "checked_at": time.time(),
+                }
             )
         )
         tmp.replace(d / f"{cache_key(remote)}.json")
@@ -140,7 +149,10 @@ def companion_exists(slug, cache, *, budget: Budget):
     except (OSError, ValueError):
         known = {}
     hit = known.get(slug.lower())
-    if isinstance(hit, dict) and 0 <= time.time() - hit.get("checked_at", 0) < COMPANION_TTL:
+    if (
+        isinstance(hit, dict)
+        and 0 <= time.time() - hit.get("checked_at", 0) < COMPANION_TTL
+    ):
         return hit.get("exists")
     answer = gh_repo_view(slug, budget=budget)
     if answer is None:
@@ -193,7 +205,9 @@ def _fetch_vocabulary(budget: Budget):
     if not isinstance(rows, list):
         return None
     return [
-        {"term": v.get("term"), "entity": v.get("entity")} for v in rows if isinstance(v, dict)
+        {"term": v.get("term"), "entity": v.get("entity")}
+        for v in rows
+        if isinstance(v, dict)
     ]
 
 

@@ -12,7 +12,7 @@ printf '%s' "$BODY" | public-text-guard check --repo octo/app --unattended
 from pubcheck import check
 
 v = check("As the owner asked, we fixed it.", repo="octo/app")
-v.decision, v.categories   # ('flag', ['owner-relation'])
+v.decision, v.categories  # ('flag', ['owner-relation'])
 ```
 
 A private target passes untouched. A public one, or one whose visibility is unknown, is scanned for:

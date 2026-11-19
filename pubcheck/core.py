@@ -111,7 +111,9 @@ class Verdict:
         """For the author: what was found, by category, and where the private context goes."""
         if self.decision == "unavailable":
             return f"The publication check could not be made ({self.reason}), so nothing is published."
-        lines = [f"{self.repo or 'an unknown (so presumed public) repo'} is public, and the text:"]
+        lines = [
+            f"{self.repo or 'an unknown (so presumed public) repo'} is public, and the text:"
+        ]
         for cat in self.categories:
             found = ", ".join(repr(t) for c, t in self.findings if c == cat)
             lines.append(f"- {HINTS.get(cat, cat)}: {found}")
@@ -123,7 +125,9 @@ class Verdict:
         return "\n".join(lines)
 
 
-def destination(repo: str, cache: dict, *, budget: Budget, config: Mapping | None = None) -> str:
+def destination(
+    repo: str, cache: dict, *, budget: Budget, config: Mapping | None = None
+) -> str:
     """Where the private context goes: the repo's private companion, else ``private_issues``."""
     s = settings(config)
     name = repo.split("/")[-1] if repo else ""
@@ -177,16 +181,24 @@ def check(
     than ``MAX_TEXT`` as unavailable.
     """
     texts = [t for t in (title, text, *more) if t]
-    verdict = Verdict("pass", repo=repo or "", unattended=unattended, text_hash=text_hash(*texts))
+    verdict = Verdict(
+        "pass", repo=repo or "", unattended=unattended, text_hash=text_hash(*texts)
+    )
     conf = settings({"budget_seconds": budget})
     b = Budget(conf["budget_seconds"])
 
     def logged(decision_name, **extra):
         if log:
             log_event(
-                writer=writer, surface=surface, repo=verdict.repo, decision=decision_name,
-                categories=verdict.categories, unattended=unattended,
-                text_hash=verdict.text_hash, **extra, **dict(context or {}),
+                writer=writer,
+                surface=surface,
+                repo=verdict.repo,
+                decision=decision_name,
+                categories=verdict.categories,
+                unattended=unattended,
+                text_hash=verdict.text_hash,
+                **extra,
+                **dict(context or {}),
             )
         return verdict
 
@@ -216,7 +228,9 @@ def check(
             return logged("unavailable", reason=verdict.reason)
         if unattended and sum(len(t) for t in texts) > MAX_TEXT:
             verdict.decision = "unavailable"
-            verdict.reason = f"the text is longer than {MAX_TEXT} characters, which is not checked"
+            verdict.reason = (
+                f"the text is longer than {MAX_TEXT} characters, which is not checked"
+            )
             return logged("unavailable", reason=verdict.reason)
         vocab, available = vocabulary(budget=b)
         verdict.registry = "available" if available else "unavailable"
@@ -236,7 +250,10 @@ def check(
         verdict.findings = findings(texts, ctx, detectors=detectors)
     except Exception as error:  # a check that cannot judge holds the text
         # the type only: an error's message can echo the text
-        verdict.decision, verdict.reason = "unavailable", f"the check failed ({type(error).__name__})"
+        verdict.decision, verdict.reason = (
+            "unavailable",
+            f"the check failed ({type(error).__name__})",
+        )
         return logged("unavailable", reason=verdict.reason)
     if not verdict.findings:
         if not available and unattended:

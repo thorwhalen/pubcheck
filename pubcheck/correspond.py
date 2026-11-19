@@ -57,7 +57,11 @@ def _strings(value: Any) -> list[str]:
         return [s for v in value.values() for s in _strings(v)]
     if isinstance(value, (list, tuple, set)):
         return [s for v in value for s in _strings(v)]
-    return [str(value)] if isinstance(value, (str, int, float)) and not isinstance(value, bool) else []
+    return (
+        [str(value)]
+        if isinstance(value, (str, int, float)) and not isinstance(value, bool)
+        else []
+    )
 
 
 def _published_with(draft: Any) -> list[str]:
@@ -73,7 +77,10 @@ def _published_with(draft: Any) -> list[str]:
     out = ["@" + str(p).lstrip("@") for p in people]
     out += [s for k, v in native.items() if k != "assignees" for s in _strings(v)]
     for a in getattr(draft, "attachments", ()) or ():
-        name = getattr(a, "name", None) or str(getattr(a, "ref", "") or "").rsplit("/", 1)[-1]
+        name = (
+            getattr(a, "name", None)
+            or str(getattr(a, "ref", "") or "").rsplit("/", 1)[-1]
+        )
         out += _strings(name or None)
     return out
 
@@ -86,7 +93,16 @@ def make_before_send(
 ) -> Callable[..., None]:
     """A correspond ``before_send`` check; ``config`` overrides pubcheck's settings (``hold_repo``…)."""
 
-    def before_send(ref, draft, audience, *, operation="send", dry_run=False, message_id=None, **context):
+    def before_send(
+        ref,
+        draft,
+        audience,
+        *,
+        operation="send",
+        dry_run=False,
+        message_id=None,
+        **context,
+    ):
         if not _is_public(audience):
             return None
         from correspond.errors import NeedsApproval
@@ -117,7 +133,9 @@ def make_before_send(
         if dry_run:
             details["desk_item"] = "not filed (dry run)"
         else:
-            filed = hold(verdict, target=target, text=text, title=title, more=more, config=config)
+            filed = hold(
+                verdict, target=target, text=text, title=title, more=more, config=config
+            )
             details["desk_item"] = filed.get("url") or f"not filed: {filed.get('reason')}"
         why = (
             f"held for review: {', '.join(verdict.categories)} in a post to a public audience"

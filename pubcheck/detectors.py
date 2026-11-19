@@ -66,7 +66,9 @@ OWNER_RELATION = [
         r"rule|decision|complaint|correspondence)s?\b",
         re.I,
     ),
-    re.compile(r"\bthe user['’]s (?:preference|correction|instruction|feedback|rule)s?\b", re.I),
+    re.compile(
+        r"\bthe user['’]s (?:preference|correction|instruction|feedback|rule)s?\b", re.I
+    ),
     re.compile(r"\bmy (?:agents?|fleet|clients?)\b", re.I),
 ]
 _QUOTED = re.compile(r"```.*?```|\"[^\"]*\"|“[^”]*”|`[^`]*`", re.S)
@@ -102,7 +104,11 @@ def _local_paths():
 def dictionary_words() -> frozenset:
     """Lowercased words of the system dictionary; empty when the machine has none."""
     try:
-        with open(os.environ.get(DICTIONARY_ENV) or DICTIONARY, encoding="utf-8", errors="ignore") as f:
+        with open(
+            os.environ.get(DICTIONARY_ENV) or DICTIONARY,
+            encoding="utf-8",
+            errors="ignore",
+        ) as f:
             return frozenset(w.strip().lower() for w in f)
     except OSError:
         return frozenset()
@@ -118,20 +124,26 @@ def _term_pattern(term):
     body = r"\s+".join(re.escape(w) for w in term.split())
     single = len(term.split()) == 1
     if single and term.isalpha() and term.islower() and not dictionary_words():
-        return re.compile(rf"(?<=[@/]){body}(?![\w-])", re.I)  # no dictionary: handles only
+        return re.compile(
+            rf"(?<=[@/]){body}(?![\w-])", re.I
+        )  # no dictionary: handles only
     flags = 0 if single and term[:1].isupper() and is_common(term) else re.I
     return re.compile(rf"(?<![\w-]){body}(?![\w-])", flags)
 
 
 def registry(text, ctx):
     """The registry's terms for this repo (``ctx["terms"]``) found in the text."""
-    return [("registry", t) for t in ctx.get("terms", ()) if _term_pattern(t).search(text)]
+    return [
+        ("registry", t) for t in ctx.get("terms", ()) if _term_pattern(t).search(text)
+    ]
 
 
 def owner_relation(text, ctx):
     """Phrases that relay the owner's own preferences, corrections or relations."""
     bare = _QUOTED.sub(" ", text)
-    return [("owner-relation", m.group(0)) for p in OWNER_RELATION for m in p.finditer(bare)]
+    return [
+        ("owner-relation", m.group(0)) for p in OWNER_RELATION for m in p.finditer(bare)
+    ]
 
 
 @lru_cache(maxsize=256)

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pubcheck"
-version = "0.0.1"
+version = "0.0.2"
 description = "One publication check for every writer: is this text fit for a public repository? Personal names, the owner's own matters, private references, credentials and @mentions, failing closed when nobody is watching."
 readme = "README.md"
 requires-python = ">=3.11"

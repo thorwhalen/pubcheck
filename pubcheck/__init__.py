@@ -18,4 +18,11 @@ from pubcheck.core import Verdict, check
 from pubcheck.detectors import DETECTORS, UNATTENDED_DETECTORS, findings
 from pubcheck.hold import file_hold
 
-__all__ = ["DETECTORS", "UNATTENDED_DETECTORS", "Verdict", "check", "file_hold", "findings"]
+__all__ = [
+    "DETECTORS",
+    "UNATTENDED_DETECTORS",
+    "Verdict",
+    "check",
+    "file_hold",
+    "findings",
+]

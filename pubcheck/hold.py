@@ -65,7 +65,12 @@ def hold_key(verdict: Verdict, target: str) -> str:
 
 
 def hold_body(
-    verdict: Verdict, *, target: str, text: str, title: str | None, more: Sequence[str] = ()
+    verdict: Verdict,
+    *,
+    target: str,
+    text: str,
+    title: str | None,
+    more: Sequence[str] = (),
 ) -> str:
     """The desk item's body: why it was held, what would have been published, and the key."""
     why = (
@@ -74,7 +79,11 @@ def hold_body(
         else [f"- the check was unavailable: {verdict.reason}"]
     )
     text, title = redact(text), redact(title) if title else title
-    also = [f"**Also published with it:** {', '.join(redact(m) for m in more)}", ""] if more else []
+    also = (
+        [f"**Also published with it:** {', '.join(redact(m) for m in more)}", ""]
+        if more
+        else []
+    )
     return "\n".join(
         [
             f"A post to `{target}` ({verdict.visibility}) was held by the publication check, "
@@ -103,8 +112,19 @@ def hold_body(
 def _existing(repo: str, key: str, budget: Budget):
     r = budget.run(
         [
-            "gh", "issue", "list", "-R", repo, "--state", "open", "--search",
-            f'"{MARKER}: {key}" in:body', "--json", "url", "-q", ".[0].url",
+            "gh",
+            "issue",
+            "list",
+            "-R",
+            repo,
+            "--state",
+            "open",
+            "--search",
+            f'"{MARKER}: {key}" in:body',
+            "--json",
+            "url",
+            "-q",
+            ".[0].url",
         ],
         cap=8,
     )
@@ -131,7 +151,9 @@ def file_hold(
     if not shutil.which("gh"):
         return {"filed": False, "reason": "gh is not installed"}
     try:
-        private = gh_repo_view(repo, budget=budget)  # fresh: never trust a cache before copying
+        private = gh_repo_view(
+            repo, budget=budget
+        )  # fresh: never trust a cache before copying
         if private is not True:
             return {
                 "filed": False,
@@ -141,13 +163,26 @@ def file_hold(
         if url:
             return {"filed": True, "url": url, "repo": repo, "existing": True}
         body = hold_body(verdict, target=target, text=text, title=title, more=more)
-        argv = ["gh", "issue", "create", "-R", repo, "--title", hold_title(target, title),
-                "--body-file", "-"]
+        argv = [
+            "gh",
+            "issue",
+            "create",
+            "-R",
+            repo,
+            "--title",
+            hold_title(target, title),
+            "--body-file",
+            "-",
+        ]
         if label:
             argv += ["--label", label]
         r = budget.run(argv, cap=20, stdin=body)
         if r is None or r.returncode != 0:
-            err = (r.stderr.strip().splitlines() or ["?"])[-1] if r is not None else "out of time"
+            err = (
+                (r.stderr.strip().splitlines() or ["?"])[-1]
+                if r is not None
+                else "out of time"
+            )
             return {"filed": False, "reason": f"gh issue create failed: {err}"}
         return {"filed": True, "url": r.stdout.strip().splitlines()[-1], "repo": repo}
     except Exception as error:
