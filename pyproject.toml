@@ -40,7 +40,9 @@ public-text-guard = "pubcheck.__main__:main"
 pubcheck = "pubcheck.__main__:main"
 
 [project.optional-dependencies]
+correspond = ["correspond"]  # for pubcheck.correspond; correspond imports it, not the reverse
 dev = [
+    "correspond",
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",
@@ -82,6 +84,10 @@ test = []
 post_test = []
 lint = []
 format = []
+
+# The correspond adapter's tests need correspond.
+[tool.wads.ci.install]
+extras = "correspond"
 
 [tool.wads.ci.env]
 required_envvars = []

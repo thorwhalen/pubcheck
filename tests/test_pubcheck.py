@@ -363,7 +363,12 @@ def test_settings_from_env(env, monkeypatch):
 # ---- correspond's before_send ----
 
 
-correspond = pytest.importorskip("correspond")
+try:
+    import correspond  # noqa: F401
+    HAS_CORRESPOND = True
+except ImportError:
+    HAS_CORRESPOND = False
+needs_correspond = pytest.mark.skipif(not HAS_CORRESPOND, reason="correspond is not installed")
 
 
 def send(text, *, scope="public", repo=PUBLIC, dry_run=True, title=None, notify=(), native=None, hold=None):
@@ -378,6 +383,7 @@ def send(text, *, scope="public", repo=PUBLIC, dry_run=True, title=None, notify=
     return holds
 
 
+@needs_correspond
 def test_before_send(env):
     from correspond.errors import NeedsApproval
 
@@ -402,6 +408,7 @@ def test_before_send(env):
     assert e.value.details["desk_item"] == "https://desk/7" and holds[0]["target"] == f"github:{PUBLIC}"
 
 
+@needs_correspond
 def test_before_send_fails_closed(env, monkeypatch):
     from correspond.errors import NeedsApproval
 
@@ -411,6 +418,7 @@ def test_before_send_fails_closed(env, monkeypatch):
     assert e.value.details["decision"] == "unavailable"
 
 
+@needs_correspond
 def test_before_send_through_correspond_check(env):
     """correspond's own ``outbound.check`` runs it and reports needs_approval."""
     from correspond.model import Audience, ConversationRef, Draft
