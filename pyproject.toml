@@ -9,7 +9,7 @@ name = "pubcheck"
 version = "0.0.1"
 description = "One publication check for every writer: is this text fit for a public repository? Personal names, the owner's own matters, private references, credentials and @mentions, failing closed when nobody is watching."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 keywords = ["privacy", "github", "publication", "guard", "agents", "claude-code"]
 authors = [
     { name = "Thor Whalen" },
@@ -56,7 +56,7 @@ only-include = ["pubcheck", "tests", ".github", "README.md", "LICENSE", "pyproje
 
 [tool.ruff]
 line-length = 90
-target-version = "py310"
+target-version = "py311"
 exclude = ["**/*.ipynb", ".git", ".venv", "build", "dist", "tests"]
 
 [tool.ruff.lint]
@@ -107,7 +107,7 @@ enabled = false
 
 [tool.wads.ci.testing]
 enabled = true
-python_versions = ["3.10", "3.12"]
+python_versions = ["3.11", "3.12"]
 pytest_args = ["-v", "--tb=short"]
 coverage_enabled = true
 coverage_threshold = 0

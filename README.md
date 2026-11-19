@@ -40,7 +40,7 @@ With `hold_repo` set, a held post is filed as an issue in that private repo with
 
 ## Settings
 
-`~/.config/pubcheck/config.toml` (`$PUBCHECK_CONFIG` names another file; Python 3.11+), then environment variables, then keyword arguments:
+`~/.config/pubcheck/config.toml` (`$PUBCHECK_CONFIG` names another file), then environment variables, then keyword arguments:
 
 | key | env | default |
 |---|---|---|

@@ -30,10 +30,7 @@ import time
 from collections.abc import Mapping
 from pathlib import Path
 
-try:  # Python 3.11+
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover
-    tomllib = None
+import tomllib
 
 BUDGET_SECONDS = 12.0
 MAX_TEXT = 70_000  # characters; GitHub caps a body at 65,536, and longer is not checked
@@ -132,7 +129,7 @@ def settings(overrides: Mapping | None = None) -> dict:
     """
     out = dict(DFLT_SETTINGS)
     path = Path(os.environ.get(CONFIG_ENV) or CONFIG_FILE).expanduser()
-    if tomllib is not None and path.is_file():
+    if path.is_file():
         try:
             data = tomllib.loads(path.read_text())
         except (OSError, ValueError):
