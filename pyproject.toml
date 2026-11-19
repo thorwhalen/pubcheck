@@ -40,7 +40,7 @@ public-text-guard = "pubcheck.__main__:main"
 pubcheck = "pubcheck.__main__:main"
 
 [project.optional-dependencies]
-correspond = ["correspond"]  # for pubcheck.correspond; correspond imports it, not the reverse
+correspond = ["correspond"]  # pubcheck.correspond, the before_send adapter (imported only there)
 dev = [
     "correspond",
     "pytest>=7.0",
