@@ -1,0 +1,32 @@
+﻿pubcheck
+========
+
+.. automodule:: pubcheck
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check
+      file_hold
+      findings
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Verdict
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   base
+   core
+   correspond
+   detectors
+   hold
+   sources

@@ -1,0 +1,18 @@
+# pubcheck
+
+> One publication check for every writer: is this text fit for a public repository? Personal names, the owner's own matters, private references, credentials and @mentions, failing closed when nobody is watching.
+
+
+## Pages in this subsection
+
+- [pubcheck](pubcheck.html.md): pubcheck: one publication check for every writer.
+- [pubcheck.base](pubcheck.base.html.md): What every part of the check shares: the time budget, private files, the settings and the event log.
+- [pubcheck.core](pubcheck.core.html.md): The check: is this text fit for the repo it is about to be published to?
+- [pubcheck.correspond](pubcheck.correspond.html.md): correspond’s &#96;before_send&#96; check: the publication check for every write correspond makes.
+- [pubcheck.detectors](pubcheck.detectors.html.md): The detectors: what in a text a public reader may not see.
+- [pubcheck.hold](pubcheck.hold.html.md): A held post becomes a desk item: an issue in a private repo, labelled for the desk.
+- [pubcheck.sources](pubcheck.sources.html.md): What the check looks up: a repo’s visibility, the acquaint registry, private companions.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

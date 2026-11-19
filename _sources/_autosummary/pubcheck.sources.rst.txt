@@ -1,0 +1,21 @@
+pubcheck.sources
+================
+
+.. automodule:: pubcheck.sources
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_key
+      cached_visibility
+      companion_exists
+      gh_repo_view
+      lookup_visibility
+      origin
+      parse_slug
+      terms_for
+      vocabulary
+      write_visibility
+   

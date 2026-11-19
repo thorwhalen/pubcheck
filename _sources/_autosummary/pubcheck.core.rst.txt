@@ -1,0 +1,25 @@
+pubcheck.core
+=============
+
+.. automodule:: pubcheck.core
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      HINTS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check
+      destination
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Verdict
+   

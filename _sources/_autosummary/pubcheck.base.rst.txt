@@ -1,0 +1,29 @@
+pubcheck.base
+=============
+
+.. automodule:: pubcheck.base
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_SETTINGS
+      SETTINGS_ENV
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_dir
+      log_event
+      settings
+      text_hash
+      write_private
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Budget
+   

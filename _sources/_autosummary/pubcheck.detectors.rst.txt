@@ -1,0 +1,27 @@
+pubcheck.detectors
+==================
+
+.. automodule:: pubcheck.detectors
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DETECTORS
+      UNATTENDED_DETECTORS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      credential
+      dictionary_words
+      findings
+      is_common
+      mention
+      owner_relation
+      private_ref
+      registry
+      session_link
+   

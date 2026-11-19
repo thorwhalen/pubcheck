@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="pink" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pubcheck.core - pubcheck</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pubcheck.correspond" href="pubcheck.correspond.html" /><link rel="prev" title="pubcheck.base" href="pubcheck.base.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="pubcheck.core"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="pubcheck.core.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>pubcheck</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/thorwhalen/pubcheck" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pubcheck.html">pubcheck</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.base.html">pubcheck.base</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pubcheck.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.correspond.html">pubcheck.correspond</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.detectors.html">pubcheck.detectors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.hold.html">pubcheck.hold</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.sources.html">pubcheck.sources</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#pubcheck.core.HINTS"><code class="docutils literal notranslate"><span class="pre">HINTS</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.Verdict"><code class="docutils literal notranslate"><span class="pre">Verdict</span></code></a><ul>
+<li><a class="reference internal" href="#pubcheck.core.Verdict.categories"><code class="docutils literal notranslate"><span class="pre">Verdict.categories</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.Verdict.exit_code"><code class="docutils literal notranslate"><span class="pre">Verdict.exit_code</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.Verdict.explain"><code class="docutils literal notranslate"><span class="pre">Verdict.explain()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.Verdict.held"><code class="docutils literal notranslate"><span class="pre">Verdict.held</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.Verdict.to_json"><code class="docutils literal notranslate"><span class="pre">Verdict.to_json()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pubcheck.core.check"><code class="docutils literal notranslate"><span class="pre">check()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.core.destination"><code class="docutils literal notranslate"><span class="pre">destination()</span></code></a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">pubcheck</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../api.html"><span itemprop="name">API reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="pubcheck.html"><span itemprop="name">pubcheck</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="3" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">pubcheck.core</strong>
+        <meta itemprop="position" content="4" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <section id="module-pubcheck.core">
+<span id="pubcheck-core"></span><h1>pubcheck.core<a class="headerlink" href="#module-pubcheck.core" title="Link to this heading">#</a></h1>
+<p>The check: is this text fit for the repo it is about to be published to?</p>
+<p><a class="reference internal" href="#pubcheck.core.check" title="pubcheck.core.check"><code class="xref py py-func docutils literal notranslate"><span class="pre">check()</span></code></a> is the one entry point every writer calls (the Claude Code hook through the
+CLI, correspond’s <code class="docutils literal notranslate"><span class="pre">before_send</span></code>, hatchway through the CLI). It answers a <a class="reference internal" href="#pubcheck.core.Verdict" title="pubcheck.core.Verdict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Verdict</span></code></a>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pass</span></code>: a private target (nothing is scanned), or nothing found;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flag</span></code>: a detector found something; the text must not be published as is;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unavailable</span></code>: the check could not be made. For an <strong>unattended</strong> writer (nobody
+reads the post before it goes out) that is a missing registry, a lookup out of time, or
+any error; such a writer must hold the text, never post it. An attended writer proceeds
+without the registry (the gap is logged), and only an error makes the check unavailable;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">override</span></code>: found something, but the author gave a reason to publish anyway (the
+hook’s <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">public-text-ok:</span> <span class="pre">&lt;reason&gt;</span></code>); logged with the reason.</p></li>
+</ul>
+<p>An unknown visibility (offline, no <code class="docutils literal notranslate"><span class="pre">gh</span></code>, no such repo, no repo named) is public.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">check</span><span class="p">(</span><span class="s2">"A neutral release note."</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="s2">"o/r"</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">decision</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">exit_code</span>
+</span><span data-line="3"><span class="go">('pass', 0)</span>
+</span><span data-line="4"><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="n">check</span><span class="p">(</span><span class="s2">"As the owner asked, we fixed it."</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="s2">"o/r"</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span data-line="5"><span class="gp">&gt;&gt;&gt; </span><span class="n">v</span><span class="o">.</span><span class="n">decision</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">exit_code</span>
+</span><span data-line="6"><span class="go">('flag', ['owner-relation'], 1)</span>
+</span><span data-line="7"><span class="gp">&gt;&gt;&gt; </span><span class="n">check</span><span class="p">(</span><span class="s2">"the owner asked"</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="s2">"o/r"</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">decision</span>
+</span><span data-line="8"><span class="go">'pass'</span>
+</span></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.core.HINTS" title="pubcheck.core.HINTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HINTS</span></code></a></p></td>
+<td><p>One line per category, for the author who has to reword.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.core.check" title="pubcheck.core.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code></a>(text, *[, repo, title, more, ...])</p></td>
+<td><p>Check <code class="docutils literal notranslate"><span class="pre">text</span></code> (and <code class="docutils literal notranslate"><span class="pre">title</span></code>) for publication to <code class="docutils literal notranslate"><span class="pre">repo</span></code>; never raises.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.core.destination" title="pubcheck.core.destination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">destination</span></code></a>(repo, cache, *, budget[, config])</p></td>
+<td><p>Where the private context goes: the repo's private companion, else <code class="docutils literal notranslate"><span class="pre">private_issues</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.core.Verdict" title="pubcheck.core.Verdict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Verdict</span></code></a>(decision[, repo, visibility, ...])</p></td>
+<td><p>What the check decided about one text, and why; <code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json()</span></code> never holds the text.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.core.HINTS">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.core.</span></span><span class="sig-name descname"><span class="pre">HINTS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'credential':</span> <span class="pre">'carries</span> <span class="pre">a</span> <span class="pre">credential-shaped</span> <span class="pre">string</span> <span class="pre">(a</span> <span class="pre">token,</span> <span class="pre">a</span> <span class="pre">key,</span> <span class="pre">a</span> <span class="pre">password</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">URL)',</span> <span class="pre">'mention':</span> <span class="pre">'&#64;mentions</span> <span class="pre">someone,</span> <span class="pre">which</span> <span class="pre">notifies</span> <span class="pre">them:</span> <span class="pre">posting</span> <span class="pre">it</span> <span class="pre">is</span> <span class="pre">messaging</span> <span class="pre">them',</span> <span class="pre">'owner-relation':</span> <span class="pre">'relays</span> <span class="pre">the</span> <span class="pre">owner\'s</span> <span class="pre">own</span> <span class="pre">preferences,</span> <span class="pre">corrections</span> <span class="pre">or</span> <span class="pre">relations</span> <span class="pre">(&quot;the</span> <span class="pre">operator</span> <span class="pre">stated&quot;,</span> <span class="pre">&quot;my</span> <span class="pre">agents&quot;)',</span> <span class="pre">'private-ref':</span> <span class="pre">'points</span> <span class="pre">at</span> <span class="pre">a</span> <span class="pre">private</span> <span class="pre">repo,</span> <span class="pre">working</span> <span class="pre">folder</span> <span class="pre">or</span> <span class="pre">local</span> <span class="pre">path',</span> <span class="pre">'registry':</span> <span class="pre">&quot;names</span> <span class="pre">a</span> <span class="pre">person</span> <span class="pre">or</span> <span class="pre">org</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">owner's</span> <span class="pre">acquaint</span> <span class="pre">records</span> <span class="pre">that</span> <span class="pre">a</span> <span class="pre">public</span> <span class="pre">reader</span> <span class="pre">may</span> <span class="pre">not</span> <span class="pre">see&quot;,</span> <span class="pre">'session-link':</span> <span class="pre">'carries</span> <span class="pre">a</span> <span class="pre">Claude</span> <span class="pre">session</span> <span class="pre">link</span> <span class="pre">(strip</span> <span class="pre">it)'}</span></span><a class="headerlink" href="#pubcheck.core.HINTS" title="Link to this definition">#</a></dt>
+<dd><p>One line per category, for the author who has to reword.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pubcheck.core.</span></span><span class="sig-name descname"><span class="pre">Verdict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decision</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visibility</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unknown'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">findings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">list()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">registry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'skipped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unattended</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_hash</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/core.html#Verdict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.core.Verdict" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>What the check decided about one text, and why; <a class="reference internal" href="#pubcheck.core.Verdict.to_json" title="pubcheck.core.Verdict.to_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_json()</span></code></a> never holds the text.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict.categories">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">categories</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#pubcheck.core.Verdict.categories" title="Link to this definition">#</a></dt>
+<dd><p>The categories found, sorted, each once.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict.exit_code">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exit_code</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><span class="pre">int</span></a></span><a class="headerlink" href="#pubcheck.core.Verdict.exit_code" title="Link to this definition">#</a></dt>
+<dd><p>0 pass (or override), 1 flag, 2 unavailable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict.explain">
+<span class="sig-name descname"><span class="pre">explain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/core.html#Verdict.explain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.core.Verdict.explain" title="Link to this definition">#</a></dt>
+<dd><p>For the author: what was found, by category, and where the private context goes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict.held">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">held</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#pubcheck.core.Verdict.held" title="Link to this definition">#</a></dt>
+<dd><p>Whether a writer must hold the text instead of publishing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pubcheck.core.Verdict.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">terms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/core.html#Verdict.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.core.Verdict.to_json" title="Link to this definition">#</a></dt>
+<dd><p>The verdict as JSON: categories, never the text; the matched terms only on request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.core.check">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.core.</span></span><span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">more</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unattended</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">public</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">budget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pubcheck'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/core.html#check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.core.check" title="Link to this definition">#</a></dt>
+<dd><p>Check <code class="docutils literal notranslate"><span class="pre">text</span></code> (and <code class="docutils literal notranslate"><span class="pre">title</span></code>) for publication to <code class="docutils literal notranslate"><span class="pre">repo</span></code>; never raises.</p>
+<p><code class="docutils literal notranslate"><span class="pre">more</span></code> are other strings published with it (labels, a category, file names, the
+people a post notifies as <code class="docutils literal notranslate"><span class="pre">&#64;login</span></code>). <code class="docutils literal notranslate"><span class="pre">public</span></code> skips the visibility lookup when the
+caller already knows (correspond’s audience). <code class="docutils literal notranslate"><span class="pre">repo_dir</span></code> names a checkout whose
+<code class="docutils literal notranslate"><span class="pre">origin</span></code> is the target when <code class="docutils literal notranslate"><span class="pre">repo</span></code> is not given. <code class="docutils literal notranslate"><span class="pre">detectors</span></code> defaults by
+<code class="docutils literal notranslate"><span class="pre">unattended</span></code>. <code class="docutils literal notranslate"><span class="pre">override</span></code> is ignored when <code class="docutils literal notranslate"><span class="pre">unattended</span></code>: nobody is there to give a
+reason. <code class="docutils literal notranslate"><span class="pre">context</span></code> adds fields to the log event (a session id, a tool name), never text.</p>
+<p>An unattended check asks GitHub for the visibility instead of trusting a cached
+“private” (a repo made public today must not pass unscanned), and holds a text longer
+than <code class="docutils literal notranslate"><span class="pre">MAX_TEXT</span></code> as unavailable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#pubcheck.core.Verdict" title="pubcheck.core.Verdict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Verdict</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.core.destination">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.core.</span></span><span class="sig-name descname"><span class="pre">destination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">budget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/core.html#destination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.core.destination" title="Link to this definition">#</a></dt>
+<dd><p>Where the private context goes: the repo’s private companion, else <code class="docutils literal notranslate"><span class="pre">private_issues</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="pubcheck.base.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">pubcheck.base</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="pubcheck.correspond.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">pubcheck.correspond</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/thorwhalen/pubcheck" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

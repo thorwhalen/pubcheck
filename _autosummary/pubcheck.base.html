@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="pink" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pubcheck.base - pubcheck</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pubcheck.core" href="pubcheck.core.html" /><link rel="prev" title="pubcheck" href="pubcheck.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d88b86f9" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx_autodoc_typehints.css?v=057ac668" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    
+  <meta property="og:type" content="website"/><meta property="og:title" content="pubcheck.base"/>
+    <meta name="twitter:card" content="summary"/>
+  
+<link rel="alternate" type="text/markdown" href="pubcheck.base.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+</head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>pubcheck</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/thorwhalen/pubcheck" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pubcheck.html">pubcheck</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pubcheck.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.core.html">pubcheck.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.correspond.html">pubcheck.correspond</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.detectors.html">pubcheck.detectors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.hold.html">pubcheck.hold</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pubcheck.sources.html">pubcheck.sources</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#pubcheck.base.Budget"><code class="docutils literal notranslate"><span class="pre">Budget</span></code></a><ul>
+<li><a class="reference internal" href="#pubcheck.base.Budget.left"><code class="docutils literal notranslate"><span class="pre">Budget.left()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.Budget.run"><code class="docutils literal notranslate"><span class="pre">Budget.run()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.SETTINGS_ENV"><code class="docutils literal notranslate"><span class="pre">SETTINGS_ENV</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.cache_dir"><code class="docutils literal notranslate"><span class="pre">cache_dir()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.log_event"><code class="docutils literal notranslate"><span class="pre">log_event()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.settings"><code class="docutils literal notranslate"><span class="pre">settings()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.text_hash"><code class="docutils literal notranslate"><span class="pre">text_hash()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.write_private"><code class="docutils literal notranslate"><span class="pre">write_private()</span></code></a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">pubcheck</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../api.html"><span itemprop="name">API reference</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="pubcheck.html"><span itemprop="name">pubcheck</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="3" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">pubcheck.base</strong>
+        <meta itemprop="position" content="4" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="relative min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+  <article class="yue dark-code" role="main">
+          <section id="module-pubcheck.base">
+<span id="pubcheck-base"></span><h1>pubcheck.base<a class="headerlink" href="#module-pubcheck.base" title="Link to this heading">#</a></h1>
+<p>What every part of the check shares: the time budget, private files, the settings and the event log.</p>
+<p><strong>The budget.</strong> Every lookup (<code class="docutils literal notranslate"><span class="pre">gh</span></code>, <code class="docutils literal notranslate"><span class="pre">acquaint</span></code>, <code class="docutils literal notranslate"><span class="pre">git</span></code>) runs inside one
+<a class="reference internal" href="#pubcheck.base.Budget" title="pubcheck.base.Budget"><code class="xref py py-class docutils literal notranslate"><span class="pre">Budget</span></code></a>, so a check decides within its deadline instead of being killed by its
+caller. Out of time, a lookup answers <code class="docutils literal notranslate"><span class="pre">None</span></code> (unknown), and the caller decides what
+unknown means: presumed public for visibility, unavailable for the registry.</p>
+<p><strong>Settings.</strong> One mapping, read from <code class="docutils literal notranslate"><span class="pre">~/.config/pubcheck/config.toml</span></code>
+(<code class="docutils literal notranslate"><span class="pre">$PUBCHECK_CONFIG</span></code> names another file), with environment variables over it, and keyword
+arguments over both at each call site. The keys are in <a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a>.</p>
+<p><strong>The log.</strong> <code class="docutils literal notranslate"><span class="pre">~/.local/state/public-text-guard/events.jsonl</span></code> (mode 0600,
+<code class="docutils literal notranslate"><span class="pre">$PUBLIC_TEXT_GUARD_STATE_DIR</span></code>), one JSON object per decision worth keeping: never the
+text and never the matched terms, only the categories, the repo, the writer, a short hash
+of the text (so two events about the same text can be paired), an error’s type, and an
+override’s reason as its author wrote it.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Budget</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span data-line="2"><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">"true"</span><span class="p">])</span> <span class="ow">is</span> <span class="kc">None</span>  <span class="c1"># no time left: no subprocess at all</span>
+</span><span data-line="3"><span class="go">True</span>
+</span></pre></div>
+</div>
+<p class="rubric">Module Attributes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a></p></td>
+<td><p>The settings and their defaults.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.SETTINGS_ENV" title="pubcheck.base.SETTINGS_ENV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETTINGS_ENV</span></code></a></p></td>
+<td><p>config only).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.cache_dir" title="pubcheck.base.cache_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_dir</span></code></a>()</p></td>
+<td><p>Where the vocabulary and the companion answers are cached.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.log_event" title="pubcheck.base.log_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_event</span></code></a>(**fields)</p></td>
+<td><p>Append one event to the private log; never raises.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.settings" title="pubcheck.base.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>([overrides])</p></td>
+<td><p><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a>, then the config file, then the environment, then <code class="docutils literal notranslate"><span class="pre">overrides</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.text_hash" title="pubcheck.base.text_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_hash</span></code></a>(*texts)</p></td>
+<td><p>A short hash of the texts: pairs log events and desk items without copying the text.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.write_private" title="pubcheck.base.write_private"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_private</span></code></a>(path, text, *[, append])</p></td>
+<td><p>Write <code class="docutils literal notranslate"><span class="pre">text</span></code> to <code class="docutils literal notranslate"><span class="pre">path</span></code> with mode 0600, in a 0700 folder (atomically unless appending).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.Budget" title="pubcheck.base.Budget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Budget</span></code></a>([seconds])</p></td>
+<td><p>One deadline shared by every lookup of a check.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="pubcheck.base.Budget">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">Budget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One deadline shared by every lookup of a check.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pubcheck.base.Budget.left">
+<span class="sig-name descname"><span class="pre">left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.left"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.left" title="Link to this definition">#</a></dt>
+<dd><p>Seconds a lookup may take: <code class="docutils literal notranslate"><span class="pre">cap</span></code>, or what is left of the budget when less.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pubcheck.base.Budget.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.run" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">subprocess.run</span></code> within the budget; <code class="docutils literal notranslate"><span class="pre">None</span></code> when out of time or on failure.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.base.DFLT_SETTINGS">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">DFLT_SETTINGS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">12.0,</span> <span class="pre">'hold_label':</span> <span class="pre">'escalate',</span> <span class="pre">'hold_repo':</span> <span class="pre">None,</span> <span class="pre">'private_issues':</span> <span class="pre">None,</span> <span class="pre">'private_owner':</span> <span class="pre">None,</span> <span class="pre">'private_patterns':</span> <span class="pre">()}</span></span><a class="headerlink" href="#pubcheck.base.DFLT_SETTINGS" title="Link to this definition">#</a></dt>
+<dd><p>The settings and their defaults. Everything that names the operator’s own repos or
+folders is unset by default and lives in their config file, never in this code:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hold_repo</span></code>: the private repo where a held post becomes a desk item (unset: no item
+is filed; it must be private, or nothing is copied there);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hold_label</span></code>: the label the desk reads;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_owner</span></code>: the account whose <code class="docutils literal notranslate"><span class="pre">&lt;owner&gt;/_&lt;name&gt;</span></code> repos are private companions
+(a reference to one is private, and a flag points at the target’s companion);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_issues</span></code>: the private repo for context that has no companion;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">private_patterns</span></code>: more regexes for private references (working folders, the
+layout of the operator’s machines), on top of this machine’s home folder.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.base.SETTINGS_ENV">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">SETTINGS_ENV</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">'PUBCHECK_BUDGET_SECONDS',</span> <span class="pre">'hold_label':</span> <span class="pre">'PUBCHECK_HOLD_LABEL',</span> <span class="pre">'hold_repo':</span> <span class="pre">'PUBCHECK_HOLD_REPO',</span> <span class="pre">'private_issues':</span> <span class="pre">'PUBCHECK_PRIVATE_ISSUES',</span> <span class="pre">'private_owner':</span> <span class="pre">'PUBCHECK_PRIVATE_OWNER'}</span></span><a class="headerlink" href="#pubcheck.base.SETTINGS_ENV" title="Link to this definition">#</a></dt>
+<dd><p>config only).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The environment variable that overrides each setting (<code class="docutils literal notranslate"><span class="pre">private_patterns</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.base.cache_dir">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">cache_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#cache_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.cache_dir" title="Link to this definition">#</a></dt>
+<dd><p>Where the vocabulary and the companion answers are cached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.base.log_event">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">log_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fields</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#log_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.log_event" title="Link to this definition">#</a></dt>
+<dd><p>Append one event to the private log; never raises.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.base.settings">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overrides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.settings" title="Link to this definition">#</a></dt>
+<dd><p><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a>, then the config file, then the environment, then <code class="docutils literal notranslate"><span class="pre">overrides</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span><span class="p">({</span><span class="s2">"hold_repo"</span><span class="p">:</span> <span class="s2">"me/_desk"</span><span class="p">})[</span><span class="s2">"hold_repo"</span><span class="p">]</span>
+</span><span data-line="2"><span class="go">'me/_desk'</span>
+</span></pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.base.text_hash">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">text_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">texts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#text_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.text_hash" title="Link to this definition">#</a></dt>
+<dd><p>A short hash of the texts: pairs log events and desk items without copying the text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pubcheck.base.write_private">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">write_private</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#write_private"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.write_private" title="Link to this definition">#</a></dt>
+<dd><p>Write <code class="docutils literal notranslate"><span class="pre">text</span></code> to <code class="docutils literal notranslate"><span class="pre">path</span></code> with mode 0600, in a 0700 folder (atomically unless appending).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="pubcheck.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">pubcheck</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="pubcheck.core.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">pubcheck.core</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright">
+  <p>
+    Made with
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+  <a href="https://github.com/thorwhalen/pubcheck" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
+</html>

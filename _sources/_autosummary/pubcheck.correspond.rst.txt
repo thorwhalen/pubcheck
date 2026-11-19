@@ -1,0 +1,19 @@
+pubcheck.correspond
+===================
+
+.. automodule:: pubcheck.correspond
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      before_send
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      before_send
+      make_before_send
+   
