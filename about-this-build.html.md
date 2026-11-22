@@ -2,18 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-11-19 09:07 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/ff1d77672f9e80781e4b0df5a06c6485e311cc01"><code>ff1d776</code></a> on branch <code>main</code>, for **pubcheck 0.0.1** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 18:44 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a</code></a> on branch <code>main</code>, for **pubcheck 0.0.2** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.1) is behind the latest release on PyPI (0.0.2): `pip install pubcheck` gives newer code than these docs describe.
+- The documented version (0.0.2) is behind the latest release on PyPI (0.0.3): `pip install pubcheck` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                            |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/ff1d77672f9e80781e4b0df5a06c6485e311cc01"><code>ff1d77672f9e80781e4b0df5a06c6485e311cc01</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code></a> |
 | Branch              | <code>main</code>                                                                                                                                          |
 | Tags at this commit | none                                                                                                                                                       |
 | Working tree        | clean                                                                                                                                                      |
@@ -24,15 +24,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/pubcheck</code>                                                           |
-| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/44493222828">44493222828</a>  |
+| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/45056652673">45056652673</a>  |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ff1d77672f9e80781e4b0df5a06c6485e311cc01</code> (in the history of the built commit) |
+| Event commit | <code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.22  |
+| epythet  | 0.2.23  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.16 |
@@ -51,14 +51,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/pubcheck/0.0.2/">0.0.2</a>, newer than the documented version (0.0.1).
+Latest release: <a href="https://pypi.org/project/pubcheck/0.0.3/">0.0.3</a>, newer than the documented version (0.0.2).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/pubcheck && cd pubcheck
-git checkout ff1d77672f9e80781e4b0df5a06c6485e311cc01
-pip install "epythet==0.2.22"
+git checkout 9bf0a6a8b3950788dae6ea1634eec0dee7ef953f
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

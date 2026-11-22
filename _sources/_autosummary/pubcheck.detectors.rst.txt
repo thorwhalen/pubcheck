@@ -8,6 +8,9 @@ pubcheck.detectors
 
    .. autosummary::
    
+      SCANNER_ARGS
+      SCANNER_ENV_DROPPED
+      SCANNER_TIMEOUT
       DETECTORS
       UNATTENDED_DETECTORS
    
@@ -19,9 +22,17 @@ pubcheck.detectors
       dictionary_words
       findings
       is_common
+      is_scanner_finding
       mention
       owner_relation
       private_ref
       registry
+      scanner_credential
       session_link
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ScannerUnavailable
    

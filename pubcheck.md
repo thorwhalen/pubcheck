@@ -1,4 +1,4 @@
-> built 2026-11-19 09:07 UTC from ff1d776 (main) · pubcheck 0.0.1. Details: build_info.json
+> built 2026-11-22 18:44 UTC from 9bf0a6a (main) · pubcheck 0.0.2. Details: build_info.json
 
 # index.html.md
 
@@ -18,7 +18,7 @@ printf '%s' "$BODY" | public-text-guard check --repo octo/app --unattended
 from pubcheck import check
 
 v = check("As the owner asked, we fixed it.", repo="octo/app")
-v.decision, v.categories   # ('flag', ['owner-relation'])
+v.decision, v.categories  # ('flag', ['owner-relation'])
 ```
 
 A private target passes untouched. A public one, or one whose visibility is unknown, is scanned for:
@@ -27,7 +27,7 @@ A private target passes untouched. A public one, or one whose visibility is unkn
 - `owner-relation`: the owner’s own preferences, corrections or relations (“the operator stated”, “my agents”);
 - `private-ref`: repos known to be private, private companions, this machine’s home folder, and your own `private_patterns`;
 - `session-link`: Claude session links;
-- `credential`: credential-shaped strings (the patterns of `openloops.egress`);
+- `credential`: credential-shaped strings (the patterns of `openloops.egress`), plus what an external secret scanner finds when you set `credential_scanner`;
 - `mention`: `@login` and `@org/team` outside code, for an **unattended** writer only, since a mention notifies a person.
 
 ## Attended and unattended writers
@@ -48,14 +48,17 @@ With `hold_repo` set, a held post is filed as an issue in that private repo with
 
 `~/.config/pubcheck/config.toml` (`$PUBCHECK_CONFIG` names another file), then environment variables, then keyword arguments:
 
-| key                | env                       | default                                                                 |
-|--------------------|---------------------------|-------------------------------------------------------------------------|
-| `hold_repo`        | `PUBCHECK_HOLD_REPO`      | unset (no desk item)                                                    |
-| `hold_label`       | `PUBCHECK_HOLD_LABEL`     | `escalate`                                                              |
-| `budget_seconds`   | `PUBCHECK_BUDGET_SECONDS` | `12`                                                                    |
-| `private_owner`    | `PUBCHECK_PRIVATE_OWNER`  | unset: the account whose `<owner>/_<name>` repos are private companions |
-| `private_issues`   | `PUBCHECK_PRIVATE_ISSUES` | unset: where context with no companion goes                             |
-| `private_patterns` | (config only)             | none: regexes for private references, such as working folders           |
+| key                  | env                           | default                                                                                      |
+|----------------------|-------------------------------|----------------------------------------------------------------------------------------------|
+| `hold_repo`          | `PUBCHECK_HOLD_REPO`          | unset (no desk item)                                                                         |
+| `hold_label`         | `PUBCHECK_HOLD_LABEL`         | `escalate`                                                                                   |
+| `budget_seconds`     | `PUBCHECK_BUDGET_SECONDS`     | `12`                                                                                         |
+| `private_owner`      | `PUBCHECK_PRIVATE_OWNER`      | unset: the account whose `<owner>/_<name>` repos are private companions                      |
+| `private_issues`     | `PUBCHECK_PRIVATE_ISSUES`     | unset: where context with no companion goes                                                  |
+| `private_patterns`   | (config only)                 | none: regexes for private references, such as working folders                                |
+| `credential_scanner` | `PUBCHECK_CREDENTIAL_SCANNER` | unset: a gitleaks-compatible scanner to run beside the built-in patterns, e.g. `betterleaks` |
+
+`credential_scanner` adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to `<scanner> stdin` with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. It runs once per check over the whole post, from a neutral folder, and only from an absolute path outside the current folder. A scanner that is missing or fails is logged as a gap: an attended check carries on with the built-in patterns (and says so once on stderr), an unattended one is `unavailable` and holds the text. A held post whose credential only the scanner found is filed without its text, since the redaction patterns cannot find that credential. `credential_scanner_args` (config only) replaces the argument list for a scanner whose flags differ.
 
 ## Caches and log
 
@@ -128,11 +131,11 @@ Seconds a lookup may take: `cap`, or what is left of the budget when less.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-#### run(argv, , cap=8.0, stdin=None)
+#### run(argv, , cap=8.0, stdin=None, env=None, cwd=None)
 
 `subprocess.run` within the budget; `None` when out of time or on failure.
 
-### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
+### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'credential_scanner': None, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
 
 The settings and their defaults. Everything that names the operator’s own repos or
 folders is unset by default and lives in their config file, never in this code:
@@ -144,9 +147,12 @@ folders is unset by default and lives in their config file, never in this code:
   (a reference to one is private, and a flag points at the target’s companion);
 - `private_issues`: the private repo for context that has no companion;
 - `private_patterns`: more regexes for private references (working folders, the
-  layout of the operator’s machines), on top of this machine’s home folder.
+  layout of the operator’s machines), on top of this machine’s home folder;
+- `credential_scanner`: an external secret scanner to run beside the built-in
+  credential patterns, e.g. `betterleaks` (unset: none is run). See
+  [`pubcheck.detectors.scanner_credential()`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential).
 
-### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
+### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'credential_scanner': 'PUBCHECK_CREDENTIAL_SCANNER', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
 
 config only).
 
@@ -376,7 +382,9 @@ and the log never holds it). A credential’s term is its pattern name, never th
   `private_patterns` (`ctx["private_patterns"]`, from the settings);
 - `session-link`: `claude.ai/code/session_…` (not on commits, whose session links a
   commit hook strips);
-- `credential`: a credential-shaped string (`openloops.egress.find_credentials()`);
+- `credential`: a credential-shaped string (`openloops.egress.find_credentials()`),
+  and, when the operator sets `credential_scanner`, what that external scanner finds
+  ([`scanner_credential()`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential));
 - `mention`: an `@login` or `@org/team` outside code, which notifies a person:
   sending it is messaging them. Only in [`UNATTENDED_DETECTORS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.UNATTENDED_DETECTORS), since an attended
   author chose to notify.
@@ -392,9 +400,12 @@ and the log never holds it). A credential’s term is its pattern name, never th
 
 ### Module Attributes
 
-| [`DETECTORS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.DETECTORS)            | the seam is this tuple.             |
-|-----------------------------------------------------------------------|-------------------------------------|
-| [`UNATTENDED_DETECTORS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.UNATTENDED_DETECTORS) | nobody chose to notify that person. |
+| [`SCANNER_ARGS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.SCANNER_ARGS)         | The arguments of a gitleaks-compatible scanner's `stdin` command (betterleaks 1.x and gitleaks 8 share them): a JSON report on stdout, the secret redacted, exit 0 on a find.   |
+|-----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SCANNER_ENV_DROPPED`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.SCANNER_ENV_DROPPED)  | Environment variables that would switch a scanner's live validation on; never passed.                                                                                           |
+| [`SCANNER_TIMEOUT`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.SCANNER_TIMEOUT)      | Seconds the scanner may take, within what is left of the check's budget.                                                                                                        |
+| [`DETECTORS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.DETECTORS)            | the seam is this tuple.                                                                                                                                                         |
+| [`UNATTENDED_DETECTORS`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.UNATTENDED_DETECTORS) | nobody chose to notify that person.                                                                                                                                             |
 
 ### Functions
 
@@ -403,20 +414,47 @@ and the log never holds it). A credential’s term is its pattern name, never th
 | [`dictionary_words`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.dictionary_words)()                    | Lowercased words of the system dictionary; empty when the machine has none.          |
 | [`findings`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.findings)(texts, ctx, \*[, detectors]) | `[(category, term)]`, each once, found by `detectors` in any of `texts`.             |
 | [`is_common`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.is_common)(word)                       | A stop word or a dictionary word (any case).                                         |
+| [`is_scanner_finding`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.is_scanner_finding)(finding)           | True for a credential an external scanner found (its term is `<scanner>:<rule>`).    |
 | [`mention`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.mention)(text, ctx)                    | `@login` and `@org/team` outside code spans and blocks: each notifies someone.       |
 | [`owner_relation`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.owner_relation)(text, ctx)             | Phrases that relay the owner's own preferences, corrections or relations.            |
 | [`private_ref`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.private_ref)(text, ctx)                | Private repos, companions, the operator's private patterns and this machine's paths. |
 | [`registry`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.registry)(text, ctx)                   | The registry's terms for this repo (`ctx["terms"]`) found in the text.               |
+| [`scanner_credential`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential)(text, ctx)         | What an external secret scanner finds, named `<scanner>:<rule id>`.                  |
 | [`session_link`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.session_link)(text, ctx)               | Claude session links (not on commits, whose session links a commit hook strips).     |
 
-### pubcheck.detectors.DETECTORS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)], [list](https://docs.python.org/3/builtins/stdtypes.html#list)], ...]* *= (<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>)*
+### Exceptions
+
+| [`ScannerUnavailable`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.ScannerUnavailable)   | A configured scanner did not run; an unattended check must not pass without it.   |
+|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+
+### pubcheck.detectors.DETECTORS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)], [list](https://docs.python.org/3/builtins/stdtypes.html#list)], ...]* *= (<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function scanner_credential>)*
 
 the seam is this tuple.
 
 * **Type:**
   The detectors for an attended writer (a Claude Code session)
 
-### pubcheck.detectors.UNATTENDED_DETECTORS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)], [list](https://docs.python.org/3/builtins/stdtypes.html#list)], ...]* *= (<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function mention>)*
+### pubcheck.detectors.SCANNER_ARGS *= ('stdin', '--report-format', 'json', '--report-path', '-', '--no-banner', '--redact', '--exit-code', '0')*
+
+The arguments of a gitleaks-compatible scanner’s `stdin` command (betterleaks 1.x and
+gitleaks 8 share them): a JSON report on stdout, the secret redacted, exit 0 on a find.
+Never a validation flag: checking whether a credential is live sends it to its vendor.
+
+### pubcheck.detectors.SCANNER_ENV_DROPPED *= ('BETTERLEAKS_VALIDATE', 'BETTERLEAKS_ANALYZE')*
+
+Environment variables that would switch a scanner’s live validation on; never passed.
+
+### pubcheck.detectors.SCANNER_TIMEOUT *= 5.0*
+
+Seconds the scanner may take, within what is left of the check’s budget.
+
+### *exception* pubcheck.detectors.ScannerUnavailable
+
+Bases: [`RuntimeError`](https://docs.python.org/3/builtins/exceptions.html#RuntimeError)
+
+A configured scanner did not run; an unattended check must not pass without it.
+
+### pubcheck.detectors.UNATTENDED_DETECTORS *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[Callable](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping)], [list](https://docs.python.org/3/builtins/stdtypes.html#list)], ...]* *= (<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function scanner_credential>, <function mention>)*
 
 nobody chose to notify that person.
 
@@ -434,7 +472,7 @@ Lowercased words of the system dictionary; empty when the machine has none.
 * **Return type:**
   [`frozenset`](https://docs.python.org/3/builtins/stdtypes.html#frozenset)
 
-### pubcheck.detectors.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>))
+### pubcheck.detectors.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function scanner_credential>))
 
 `[(category, term)]`, each once, found by `detectors` in any of `texts`.
 
@@ -444,6 +482,23 @@ Lowercased words of the system dictionary; empty when the machine has none.
 ### pubcheck.detectors.is_common(word)
 
 A stop word or a dictionary word (any case).
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
+
+### pubcheck.detectors.is_scanner_finding(finding)
+
+True for a credential an external scanner found (its term is `<scanner>:<rule>`).
+
+The built-in patterns name their findings without a colon, and only they are known
+to [`pubcheck.hold.redact()`](_autosummary/pubcheck.hold.html.md#pubcheck.hold.redact).
+
+```pycon
+>>> is_scanner_finding(("credential", "betterleaks:slack-webhook-url"))
+True
+>>> is_scanner_finding(("credential", "github_token"))
+False
+```
 
 * **Return type:**
   [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
@@ -463,6 +518,30 @@ Private repos, companions, the operator’s private patterns and this machine’
 ### pubcheck.detectors.registry(text, ctx)
 
 The registry’s terms for this repo (`ctx["terms"]`) found in the text.
+
+### pubcheck.detectors.scanner_credential(text, ctx)
+
+What an external secret scanner finds, named `<scanner>:<rule id>`.
+
+Off unless the operator sets `credential_scanner` (`betterleaks` is the one
+weighed in thorwhalen/pubcheck#3; any gitleaks-compatible `stdin` command works,
+with `credential_scanner_args` for another argument list). It adds the long tail of
+vendor formats to the built-in [`credential()`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.credential), which stays.
+
+It runs once per check, over every text of the post together (`whole_batch`). The
+text goes on stdin, never in argv; the report is redacted; validation is never asked
+for; the scanner runs from a neutral folder, so a repo’s own scanner config is not
+read, and only from an absolute path outside the current folder.
+
+A scanner that is missing, fails or runs out of time is a gap, logged every time. An
+attended check carries on with the built-in patterns (and says so once on stderr);
+an **unattended** one raises [`ScannerUnavailable`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.ScannerUnavailable), so the check is
+`unavailable` and the text is held, as any other lookup that cannot be made.
+
+```pycon
+>>> scanner_credential("AKIA...", {})  # no scanner configured
+[]
+```
 
 ### pubcheck.detectors.session_link(text, ctx)
 
@@ -496,6 +575,7 @@ text’s hash, and an open issue with that hash is reused.
 
 | [`PEM_BLOCK`](_autosummary/pubcheck.hold.html.md#pubcheck.hold.PEM_BLOCK)   | A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).   |
 |--------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| [`WITHHELD`](_autosummary/pubcheck.hold.html.md#pubcheck.hold.WITHHELD)    | What a desk item shows instead of a text whose credential only the scanner found.        |
 
 ### Functions
 
@@ -509,6 +589,10 @@ text’s hash, and an open issue with that hash is reused.
 ### pubcheck.hold.PEM_BLOCK *= re.compile('-----BEGIN [A-Z ]\*PRIVATE KEY-----.\*?(?:-----END [A-Z ]\*PRIVATE KEY-----|\\\\Z)', re.DOTALL)*
 
 A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).
+
+### pubcheck.hold.WITHHELD *= '[withheld: a secret scanner found a credential here; read the post at its source]'*
+
+What a desk item shows instead of a text whose credential only the scanner found.
 
 ### pubcheck.hold.file_hold(verdict, , target, text, title=None, more=(), config=None, budget=None)
 
@@ -646,7 +730,7 @@ File (or find) the desk item for a held post; `{"filed": bool, "url"?, "reason"?
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### pubcheck.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>))
+### pubcheck.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function scanner_credential>))
 
 `[(category, term)]`, each once, found by `detectors` in any of `texts`.
 
@@ -758,18 +842,18 @@ Record a verdict in the shared cache’s format.
 
 # About this build
 
-This documentation was built on **2026-11-19 09:07 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/ff1d77672f9e80781e4b0df5a06c6485e311cc01"><code>ff1d776</code></a> on branch <code>main</code>, for **pubcheck 0.0.1** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 18:44 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a</code></a> on branch <code>main</code>, for **pubcheck 0.0.2** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.1) is behind the latest release on PyPI (0.0.2): `pip install pubcheck` gives newer code than these docs describe.
+- The documented version (0.0.2) is behind the latest release on PyPI (0.0.3): `pip install pubcheck` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                            |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/ff1d77672f9e80781e4b0df5a06c6485e311cc01"><code>ff1d77672f9e80781e4b0df5a06c6485e311cc01</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code></a> |
 | Branch              | <code>main</code>                                                                                                                                          |
 | Tags at this commit | none                                                                                                                                                       |
 | Working tree        | clean                                                                                                                                                      |
@@ -780,15 +864,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/pubcheck</code>                                                           |
-| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/44493222828">44493222828</a>  |
+| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/45056652673">45056652673</a>  |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>ff1d77672f9e80781e4b0df5a06c6485e311cc01</code> (in the history of the built commit) |
+| Event commit | <code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.22  |
+| epythet  | 0.2.23  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.16 |
@@ -807,14 +891,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/pubcheck/0.0.2/">0.0.2</a>, newer than the documented version (0.0.1).
+Latest release: <a href="https://pypi.org/project/pubcheck/0.0.3/">0.0.3</a>, newer than the documented version (0.0.2).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/pubcheck && cd pubcheck
-git checkout ff1d77672f9e80781e4b0df5a06c6485e311cc01
-pip install "epythet==0.2.22"
+git checkout 9bf0a6a8b3950788dae6ea1634eec0dee7ef953f
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

@@ -86,7 +86,7 @@ File (or find) the desk item for a held post; `{"filed": bool, "url"?, "reason"?
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
 
-### pubcheck.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>))
+### pubcheck.findings(texts, ctx, \*, detectors=(<function registry>, <function owner_relation>, <function private_ref>, <function session_link>, <function credential>, <function scanner_credential>))
 
 `[(category, term)]`, each once, found by `detectors` in any of `texts`.
 

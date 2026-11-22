@@ -14,7 +14,7 @@ printf '%s' "$BODY" | public-text-guard check --repo octo/app --unattended
 from pubcheck import check
 
 v = check("As the owner asked, we fixed it.", repo="octo/app")
-v.decision, v.categories   # ('flag', ['owner-relation'])
+v.decision, v.categories  # ('flag', ['owner-relation'])
 ```
 
 A private target passes untouched. A public one, or one whose visibility is unknown, is scanned for:
@@ -23,7 +23,7 @@ A private target passes untouched. A public one, or one whose visibility is unkn
 - `owner-relation`: the owner’s own preferences, corrections or relations (“the operator stated”, “my agents”);
 - `private-ref`: repos known to be private, private companions, this machine’s home folder, and your own `private_patterns`;
 - `session-link`: Claude session links;
-- `credential`: credential-shaped strings (the patterns of `openloops.egress`);
+- `credential`: credential-shaped strings (the patterns of `openloops.egress`), plus what an external secret scanner finds when you set `credential_scanner`;
 - `mention`: `@login` and `@org/team` outside code, for an **unattended** writer only, since a mention notifies a person.
 
 ## Attended and unattended writers
@@ -44,14 +44,17 @@ With `hold_repo` set, a held post is filed as an issue in that private repo with
 
 `~/.config/pubcheck/config.toml` (`$PUBCHECK_CONFIG` names another file), then environment variables, then keyword arguments:
 
-| key                | env                       | default                                                                 |
-|--------------------|---------------------------|-------------------------------------------------------------------------|
-| `hold_repo`        | `PUBCHECK_HOLD_REPO`      | unset (no desk item)                                                    |
-| `hold_label`       | `PUBCHECK_HOLD_LABEL`     | `escalate`                                                              |
-| `budget_seconds`   | `PUBCHECK_BUDGET_SECONDS` | `12`                                                                    |
-| `private_owner`    | `PUBCHECK_PRIVATE_OWNER`  | unset: the account whose `<owner>/_<name>` repos are private companions |
-| `private_issues`   | `PUBCHECK_PRIVATE_ISSUES` | unset: where context with no companion goes                             |
-| `private_patterns` | (config only)             | none: regexes for private references, such as working folders           |
+| key                  | env                           | default                                                                                      |
+|----------------------|-------------------------------|----------------------------------------------------------------------------------------------|
+| `hold_repo`          | `PUBCHECK_HOLD_REPO`          | unset (no desk item)                                                                         |
+| `hold_label`         | `PUBCHECK_HOLD_LABEL`         | `escalate`                                                                                   |
+| `budget_seconds`     | `PUBCHECK_BUDGET_SECONDS`     | `12`                                                                                         |
+| `private_owner`      | `PUBCHECK_PRIVATE_OWNER`      | unset: the account whose `<owner>/_<name>` repos are private companions                      |
+| `private_issues`     | `PUBCHECK_PRIVATE_ISSUES`     | unset: where context with no companion goes                                                  |
+| `private_patterns`   | (config only)                 | none: regexes for private references, such as working folders                                |
+| `credential_scanner` | `PUBCHECK_CREDENTIAL_SCANNER` | unset: a gitleaks-compatible scanner to run beside the built-in patterns, e.g. `betterleaks` |
+
+`credential_scanner` adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to `<scanner> stdin` with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. It runs once per check over the whole post, from a neutral folder, and only from an absolute path outside the current folder. A scanner that is missing or fails is logged as a gap: an attended check carries on with the built-in patterns (and says so once on stderr), an unattended one is `unavailable` and holds the text. A held post whose credential only the scanner found is filed without its text, since the redaction patterns cannot find that credential. `credential_scanner_args` (config only) replaces the argument list for a scanner whose flags differ.
 
 ## Caches and log
 

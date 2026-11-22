@@ -172,132 +172,151 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="52"><span class="c1">#:   (a reference to one is private, and a flag points at the target's companion);</span>
 </span><span data-line="53"><span class="c1">#: - ``private_issues``: the private repo for context that has no companion;</span>
 </span><span data-line="54"><span class="c1">#: - ``private_patterns``: more regexes for private references (working folders, the</span>
-</span><span data-line="55"><span class="c1">#:   layout of the operator's machines), on top of this machine's home folder.</span>
-</span><span data-line="56"><span class="n">DFLT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span data-line="57">    <span class="s2">"hold_repo"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="58">    <span class="s2">"hold_label"</span><span class="p">:</span> <span class="s2">"escalate"</span><span class="p">,</span>
-</span><span data-line="59">    <span class="s2">"budget_seconds"</span><span class="p">:</span> <span class="n">BUDGET_SECONDS</span><span class="p">,</span>
-</span><span data-line="60">    <span class="s2">"private_owner"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="61">    <span class="s2">"private_issues"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="62">    <span class="s2">"private_patterns"</span><span class="p">:</span> <span class="p">(),</span>
-</span><span data-line="63"><span class="p">}</span>
-</span><span data-line="64"><span class="c1">#: The environment variable that overrides each setting (``private_patterns``: config only).</span>
-</span><span data-line="65"><span class="n">SETTINGS_ENV</span> <span class="o">=</span> <span class="p">{</span>
-</span><span data-line="66">    <span class="s2">"hold_repo"</span><span class="p">:</span> <span class="s2">"PUBCHECK_HOLD_REPO"</span><span class="p">,</span>
-</span><span data-line="67">    <span class="s2">"hold_label"</span><span class="p">:</span> <span class="s2">"PUBCHECK_HOLD_LABEL"</span><span class="p">,</span>
-</span><span data-line="68">    <span class="s2">"budget_seconds"</span><span class="p">:</span> <span class="s2">"PUBCHECK_BUDGET_SECONDS"</span><span class="p">,</span>
-</span><span data-line="69">    <span class="s2">"private_owner"</span><span class="p">:</span> <span class="s2">"PUBCHECK_PRIVATE_OWNER"</span><span class="p">,</span>
-</span><span data-line="70">    <span class="s2">"private_issues"</span><span class="p">:</span> <span class="s2">"PUBCHECK_PRIVATE_ISSUES"</span><span class="p">,</span>
-</span><span data-line="71"><span class="p">}</span>
-</span><span data-line="72">
-</span><span data-line="73">
+</span><span data-line="55"><span class="c1">#:   layout of the operator's machines), on top of this machine's home folder;</span>
+</span><span data-line="56"><span class="c1">#: - ``credential_scanner``: an external secret scanner to run beside the built-in</span>
+</span><span data-line="57"><span class="c1">#:   credential patterns, e.g. ``betterleaks`` (unset: none is run). See</span>
+</span><span data-line="58"><span class="c1">#:   :func:`pubcheck.detectors.scanner_credential`.</span>
+</span><span data-line="59"><span class="n">DFLT_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span data-line="60">    <span class="s2">"hold_repo"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="61">    <span class="s2">"hold_label"</span><span class="p">:</span> <span class="s2">"escalate"</span><span class="p">,</span>
+</span><span data-line="62">    <span class="s2">"budget_seconds"</span><span class="p">:</span> <span class="n">BUDGET_SECONDS</span><span class="p">,</span>
+</span><span data-line="63">    <span class="s2">"private_owner"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="64">    <span class="s2">"private_issues"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="65">    <span class="s2">"private_patterns"</span><span class="p">:</span> <span class="p">(),</span>
+</span><span data-line="66">    <span class="s2">"credential_scanner"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="67"><span class="p">}</span>
+</span><span data-line="68"><span class="c1">#: The environment variable that overrides each setting (``private_patterns``: config only).</span>
+</span><span data-line="69"><span class="n">SETTINGS_ENV</span> <span class="o">=</span> <span class="p">{</span>
+</span><span data-line="70">    <span class="s2">"hold_repo"</span><span class="p">:</span> <span class="s2">"PUBCHECK_HOLD_REPO"</span><span class="p">,</span>
+</span><span data-line="71">    <span class="s2">"hold_label"</span><span class="p">:</span> <span class="s2">"PUBCHECK_HOLD_LABEL"</span><span class="p">,</span>
+</span><span data-line="72">    <span class="s2">"budget_seconds"</span><span class="p">:</span> <span class="s2">"PUBCHECK_BUDGET_SECONDS"</span><span class="p">,</span>
+</span><span data-line="73">    <span class="s2">"private_owner"</span><span class="p">:</span> <span class="s2">"PUBCHECK_PRIVATE_OWNER"</span><span class="p">,</span>
+</span><span data-line="74">    <span class="s2">"private_issues"</span><span class="p">:</span> <span class="s2">"PUBCHECK_PRIVATE_ISSUES"</span><span class="p">,</span>
+</span><span data-line="75">    <span class="s2">"credential_scanner"</span><span class="p">:</span> <span class="s2">"PUBCHECK_CREDENTIAL_SCANNER"</span><span class="p">,</span>
+</span><span data-line="76"><span class="p">}</span>
+</span><span data-line="77">
+</span><span data-line="78">
 <div class="viewcode-block" id="Budget">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.Budget">[docs]</a>
-</span><span data-line="74"><span class="k">class</span><span class="w"> </span><span class="nc">Budget</span><span class="p">:</span>
-</span><span data-line="75"><span class="w">    </span><span class="sd">"""One deadline shared by every lookup of a check."""</span>
-</span><span data-line="76">
-</span><span data-line="77">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">BUDGET_SECONDS</span><span class="p">):</span>
-</span><span data-line="78">        <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">seconds</span>
-</span><span data-line="79">
+</span><span data-line="79"><span class="k">class</span><span class="w"> </span><span class="nc">Budget</span><span class="p">:</span>
+</span><span data-line="80"><span class="w">    </span><span class="sd">"""One deadline shared by every lookup of a check."""</span>
+</span><span data-line="81">
+</span><span data-line="82">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">BUDGET_SECONDS</span><span class="p">):</span>
+</span><span data-line="83">        <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">seconds</span>
+</span><span data-line="84">
 <div class="viewcode-block" id="Budget.left">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.Budget.left">[docs]</a>
-</span><span data-line="80">    <span class="k">def</span><span class="w"> </span><span class="nf">left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">LOOKUP_TIMEOUT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span data-line="81"><span class="w">        </span><span class="sd">"""Seconds a lookup may take: ``cap``, or what is left of the budget when less."""</span>
-</span><span data-line="82">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="83">            <span class="k">return</span> <span class="n">cap</span>
-</span><span data-line="84">        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">())</span></div>
+</span><span data-line="85">    <span class="k">def</span><span class="w"> </span><span class="nf">left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">LOOKUP_TIMEOUT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span data-line="86"><span class="w">        </span><span class="sd">"""Seconds a lookup may take: ``cap``, or what is left of the budget when less."""</span>
+</span><span data-line="87">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="88">            <span class="k">return</span> <span class="n">cap</span>
+</span><span data-line="89">        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">())</span></div>
 
-</span><span data-line="85">
+</span><span data-line="90">
 <div class="viewcode-block" id="Budget.run">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.Budget.run">[docs]</a>
-</span><span data-line="86">    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">LOOKUP_TIMEOUT</span><span class="p">,</span> <span class="n">stdin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="87"><span class="w">        </span><span class="sd">"""``subprocess.run`` within the budget; ``None`` when out of time or on failure."""</span>
-</span><span data-line="88">        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
-</span><span data-line="89">        <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">:</span>
-</span><span data-line="90">            <span class="k">return</span> <span class="kc">None</span>
-</span><span data-line="91">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="92">            <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span data-line="93">                <span class="n">argv</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">left</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">stdin</span>
-</span><span data-line="94">            <span class="p">)</span>
-</span><span data-line="95">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">SubprocessError</span><span class="p">):</span>
-</span><span data-line="96">            <span class="k">return</span> <span class="kc">None</span></div>
+</span><span data-line="91">    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
+</span><span data-line="92">        <span class="bp">self</span><span class="p">,</span>
+</span><span data-line="93">        <span class="n">argv</span><span class="p">,</span>
+</span><span data-line="94">        <span class="o">*</span><span class="p">,</span>
+</span><span data-line="95">        <span class="n">cap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">LOOKUP_TIMEOUT</span><span class="p">,</span>
+</span><span data-line="96">        <span class="n">stdin</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="97">        <span class="n">env</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="98">        <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="99">    <span class="p">):</span>
+</span><span data-line="100"><span class="w">        </span><span class="sd">"""``subprocess.run`` within the budget; ``None`` when out of time or on failure."""</span>
+</span><span data-line="101">        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
+</span><span data-line="102">        <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">:</span>
+</span><span data-line="103">            <span class="k">return</span> <span class="kc">None</span>
+</span><span data-line="104">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="105">            <span class="k">return</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span data-line="106">                <span class="n">argv</span><span class="p">,</span>
+</span><span data-line="107">                <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="108">                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="109">                <span class="n">timeout</span><span class="o">=</span><span class="n">left</span><span class="p">,</span>
+</span><span data-line="110">                <span class="nb">input</span><span class="o">=</span><span class="n">stdin</span><span class="p">,</span>
+</span><span data-line="111">                <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+</span><span data-line="112">                <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+</span><span data-line="113">            <span class="p">)</span>
+</span><span data-line="114">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">SubprocessError</span><span class="p">):</span>
+</span><span data-line="115">            <span class="k">return</span> <span class="kc">None</span></div>
 </div>
 
-</span><span data-line="97">
-</span><span data-line="98">
+</span><span data-line="116">
+</span><span data-line="117">
 <div class="viewcode-block" id="write_private">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.write_private">[docs]</a>
-</span><span data-line="99"><span class="k">def</span><span class="w"> </span><span class="nf">write_private</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="100"><span class="w">    </span><span class="sd">"""Write ``text`` to ``path`` with mode 0600, in a 0700 folder (atomically unless appending)."""</span>
-</span><span data-line="101">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="102">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="103">        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span data-line="104">        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="mo">0o700</span><span class="p">)</span>
-</span><span data-line="105">        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
-</span><span data-line="106">            <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
-</span><span data-line="107">            <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="108">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span data-line="109">            <span class="k">return</span>
-</span><span data-line="110">        <span class="n">tmp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".tmp"</span><span class="p">)</span>
-</span><span data-line="111">        <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_TRUNC</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
-</span><span data-line="112">        <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="113">            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</span><span data-line="114">        <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="115">    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-</span><span data-line="116">        <span class="k">pass</span></div>
+</span><span data-line="118"><span class="k">def</span><span class="w"> </span><span class="nf">write_private</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">append</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="119"><span class="w">    </span><span class="sd">"""Write ``text`` to ``path`` with mode 0600, in a 0700 folder (atomically unless appending)."""</span>
+</span><span data-line="120">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="121">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="122">        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="123">        <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="mo">0o700</span><span class="p">)</span>
+</span><span data-line="124">        <span class="k">if</span> <span class="n">append</span><span class="p">:</span>
+</span><span data-line="125">            <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_APPEND</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
+</span><span data-line="126">            <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="127">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span data-line="128">            <span class="k">return</span>
+</span><span data-line="129">        <span class="n">tmp</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".tmp"</span><span class="p">)</span>
+</span><span data-line="130">        <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_TRUNC</span><span class="p">,</span> <span class="mo">0o600</span><span class="p">)</span>
+</span><span data-line="131">        <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="132">            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</span><span data-line="133">        <span class="n">tmp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="134">    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+</span><span data-line="135">        <span class="k">pass</span></div>
 
-</span><span data-line="117">
-</span><span data-line="118">
+</span><span data-line="136">
+</span><span data-line="137">
 <div class="viewcode-block" id="cache_dir">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.cache_dir">[docs]</a>
-</span><span data-line="119"><span class="k">def</span><span class="w"> </span><span class="nf">cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-</span><span data-line="120"><span class="w">    </span><span class="sd">"""Where the vocabulary and the companion answers are cached."""</span>
-</span><span data-line="121">    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CACHE_DIR_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CACHE_DIR</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span></div>
+</span><span data-line="138"><span class="k">def</span><span class="w"> </span><span class="nf">cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+</span><span data-line="139"><span class="w">    </span><span class="sd">"""Where the vocabulary and the companion answers are cached."""</span>
+</span><span data-line="140">    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CACHE_DIR_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CACHE_DIR</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span></div>
 
-</span><span data-line="122">
-</span><span data-line="123">
+</span><span data-line="141">
+</span><span data-line="142">
 <div class="viewcode-block" id="settings">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.settings">[docs]</a>
-</span><span data-line="124"><span class="k">def</span><span class="w"> </span><span class="nf">settings</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span data-line="125"><span class="w">    </span><span class="sd">""":data:`DFLT_SETTINGS`, then the config file, then the environment, then ``overrides``.</span>
-</span><span data-line="126">
-</span><span data-line="127"><span class="sd">    &gt;&gt;&gt; settings({"hold_repo": "me/_desk"})["hold_repo"]</span>
-</span><span data-line="128"><span class="sd">    'me/_desk'</span>
-</span><span data-line="129"><span class="sd">    """</span>
-</span><span data-line="130">    <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">DFLT_SETTINGS</span><span class="p">)</span>
-</span><span data-line="131">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CONFIG_FILE</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
-</span><span data-line="132">    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-</span><span data-line="133">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="134">            <span class="n">data</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
-</span><span data-line="135">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-</span><span data-line="136">            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span data-line="137">        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># unknown keys are kept: a detector may read its own settings</span>
-</span><span data-line="138">    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">SETTINGS_ENV</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span data-line="139">        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
-</span><span data-line="140">            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
-</span><span data-line="141">    <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">overrides</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
-</span><span data-line="142">    <span class="n">out</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">])</span>
-</span><span data-line="143">    <span class="n">out</span><span class="p">[</span><span class="s2">"private_patterns"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"private_patterns"</span><span class="p">]</span> <span class="ow">or</span> <span class="p">())</span>
-</span><span data-line="144">    <span class="k">return</span> <span class="n">out</span></div>
-
+</span><span data-line="143"><span class="k">def</span><span class="w"> </span><span class="nf">settings</span><span class="p">(</span><span class="n">overrides</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span data-line="144"><span class="w">    </span><span class="sd">""":data:`DFLT_SETTINGS`, then the config file, then the environment, then ``overrides``.</span>
 </span><span data-line="145">
-</span><span data-line="146">
+</span><span data-line="146"><span class="sd">    &gt;&gt;&gt; settings({"hold_repo": "me/_desk"})["hold_repo"]</span>
+</span><span data-line="147"><span class="sd">    'me/_desk'</span>
+</span><span data-line="148"><span class="sd">    """</span>
+</span><span data-line="149">    <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">DFLT_SETTINGS</span><span class="p">)</span>
+</span><span data-line="150">    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CONFIG_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">CONFIG_FILE</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+</span><span data-line="151">    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+</span><span data-line="152">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="153">            <span class="n">data</span> <span class="o">=</span> <span class="n">tomllib</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+</span><span data-line="154">        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+</span><span data-line="155">            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span data-line="156">        <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># unknown keys are kept: a detector may read its own settings</span>
+</span><span data-line="157">    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">SETTINGS_ENV</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span data-line="158">        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+</span><span data-line="159">            <span class="n">out</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+</span><span data-line="160">    <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">overrides</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">})</span>
+</span><span data-line="161">    <span class="n">out</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">])</span>
+</span><span data-line="162">    <span class="n">out</span><span class="p">[</span><span class="s2">"private_patterns"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s2">"private_patterns"</span><span class="p">]</span> <span class="ow">or</span> <span class="p">())</span>
+</span><span data-line="163">    <span class="k">return</span> <span class="n">out</span></div>
+
+</span><span data-line="164">
+</span><span data-line="165">
 <div class="viewcode-block" id="text_hash">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.text_hash">[docs]</a>
-</span><span data-line="147"><span class="k">def</span><span class="w"> </span><span class="nf">text_hash</span><span class="p">(</span><span class="o">*</span><span class="n">texts</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="148"><span class="w">    </span><span class="sd">"""A short hash of the texts: pairs log events and desk items without copying the text."""</span>
-</span><span data-line="149">    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span> <span class="ow">or</span> <span class="s2">""</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-</span><span data-line="150">    <span class="k">return</span> <span class="n">digest</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span></div>
+</span><span data-line="166"><span class="k">def</span><span class="w"> </span><span class="nf">text_hash</span><span class="p">(</span><span class="o">*</span><span class="n">texts</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="167"><span class="w">    </span><span class="sd">"""A short hash of the texts: pairs log events and desk items without copying the text."""</span>
+</span><span data-line="168">    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span> <span class="ow">or</span> <span class="s2">""</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</span><span data-line="169">    <span class="k">return</span> <span class="n">digest</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span></div>
 
-</span><span data-line="151">
-</span><span data-line="152">
+</span><span data-line="170">
+</span><span data-line="171">
 <div class="viewcode-block" id="log_event">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.base.html#pubcheck.base.log_event">[docs]</a>
-</span><span data-line="153"><span class="k">def</span><span class="w"> </span><span class="nf">log_event</span><span class="p">(</span><span class="o">**</span><span class="n">fields</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="154"><span class="w">    </span><span class="sd">"""Append one event to the private log; never raises."""</span>
-</span><span data-line="155">    <span class="n">d</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">STATE_DIR_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">STATE_DIR</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
-</span><span data-line="156">    <span class="n">record</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"v"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S%z"</span><span class="p">),</span> <span class="o">**</span><span class="n">fields</span><span class="p">}</span>
-</span><span data-line="157">    <span class="n">write_private</span><span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"events.jsonl"</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</span><span data-line="172"><span class="k">def</span><span class="w"> </span><span class="nf">log_event</span><span class="p">(</span><span class="o">**</span><span class="n">fields</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="173"><span class="w">    </span><span class="sd">"""Append one event to the private log; never raises."""</span>
+</span><span data-line="174">    <span class="n">d</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">STATE_DIR_ENV</span><span class="p">)</span> <span class="ow">or</span> <span class="n">STATE_DIR</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+</span><span data-line="175">    <span class="n">record</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"v"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"time"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S%z"</span><span class="p">),</span> <span class="o">**</span><span class="n">fields</span><span class="p">}</span>
+</span><span data-line="176">    <span class="n">write_private</span><span class="p">(</span><span class="n">d</span> <span class="o">/</span> <span class="s2">"events.jsonl"</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -326,7 +345,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

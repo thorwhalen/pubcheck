@@ -9,6 +9,7 @@ pubcheck.hold
    .. autosummary::
    
       PEM_BLOCK
+      WITHHELD
    
    .. rubric:: Functions
 

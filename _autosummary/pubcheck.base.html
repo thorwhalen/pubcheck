@@ -223,7 +223,7 @@ override’s reason as its author wrote it.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pubcheck.base.Budget.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.run" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cwd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.run" title="Link to this definition">#</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">subprocess.run</span></code> within the budget; <code class="docutils literal notranslate"><span class="pre">None</span></code> when out of time or on failure.</p>
 <dl class="field-list simple">
 </dl>
@@ -233,7 +233,7 @@ override’s reason as its author wrote it.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pubcheck.base.DFLT_SETTINGS">
-<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">DFLT_SETTINGS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">12.0,</span> <span class="pre">'hold_label':</span> <span class="pre">'escalate',</span> <span class="pre">'hold_repo':</span> <span class="pre">None,</span> <span class="pre">'private_issues':</span> <span class="pre">None,</span> <span class="pre">'private_owner':</span> <span class="pre">None,</span> <span class="pre">'private_patterns':</span> <span class="pre">()}</span></span><a class="headerlink" href="#pubcheck.base.DFLT_SETTINGS" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">DFLT_SETTINGS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">12.0,</span> <span class="pre">'credential_scanner':</span> <span class="pre">None,</span> <span class="pre">'hold_label':</span> <span class="pre">'escalate',</span> <span class="pre">'hold_repo':</span> <span class="pre">None,</span> <span class="pre">'private_issues':</span> <span class="pre">None,</span> <span class="pre">'private_owner':</span> <span class="pre">None,</span> <span class="pre">'private_patterns':</span> <span class="pre">()}</span></span><a class="headerlink" href="#pubcheck.base.DFLT_SETTINGS" title="Link to this definition">#</a></dt>
 <dd><p>The settings and their defaults. Everything that names the operator’s own repos or
 folders is unset by default and lives in their config file, never in this code:</p>
 <ul class="simple">
@@ -244,13 +244,16 @@ is filed; it must be private, or nothing is copied there);</p></li>
 (a reference to one is private, and a flag points at the target’s companion);</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">private_issues</span></code>: the private repo for context that has no companion;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">private_patterns</span></code>: more regexes for private references (working folders, the
-layout of the operator’s machines), on top of this machine’s home folder.</p></li>
+layout of the operator’s machines), on top of this machine’s home folder;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">credential_scanner</span></code>: an external secret scanner to run beside the built-in
+credential patterns, e.g. <code class="docutils literal notranslate"><span class="pre">betterleaks</span></code> (unset: none is run). See
+<a class="reference internal" href="pubcheck.detectors.html#pubcheck.detectors.scanner_credential" title="pubcheck.detectors.scanner_credential"><code class="xref py py-func docutils literal notranslate"><span class="pre">pubcheck.detectors.scanner_credential()</span></code></a>.</p></li>
 </ul>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="pubcheck.base.SETTINGS_ENV">
-<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">SETTINGS_ENV</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">'PUBCHECK_BUDGET_SECONDS',</span> <span class="pre">'hold_label':</span> <span class="pre">'PUBCHECK_HOLD_LABEL',</span> <span class="pre">'hold_repo':</span> <span class="pre">'PUBCHECK_HOLD_REPO',</span> <span class="pre">'private_issues':</span> <span class="pre">'PUBCHECK_PRIVATE_ISSUES',</span> <span class="pre">'private_owner':</span> <span class="pre">'PUBCHECK_PRIVATE_OWNER'}</span></span><a class="headerlink" href="#pubcheck.base.SETTINGS_ENV" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">SETTINGS_ENV</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">'PUBCHECK_BUDGET_SECONDS',</span> <span class="pre">'credential_scanner':</span> <span class="pre">'PUBCHECK_CREDENTIAL_SCANNER',</span> <span class="pre">'hold_label':</span> <span class="pre">'PUBCHECK_HOLD_LABEL',</span> <span class="pre">'hold_repo':</span> <span class="pre">'PUBCHECK_HOLD_REPO',</span> <span class="pre">'private_issues':</span> <span class="pre">'PUBCHECK_PRIVATE_ISSUES',</span> <span class="pre">'private_owner':</span> <span class="pre">'PUBCHECK_PRIVATE_OWNER'}</span></span><a class="headerlink" href="#pubcheck.base.SETTINGS_ENV" title="Link to this definition">#</a></dt>
 <dd><p>config only).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -360,7 +363,7 @@ layout of the operator’s machines), on top of this machine’s home folder.</p
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>

@@ -14,7 +14,7 @@
 - [pubcheck.detectors](_autosummary/pubcheck.detectors.html.md): The detectors: what in a text a public reader may not see.
 - [pubcheck.hold](_autosummary/pubcheck.hold.html.md): A held post becomes a desk item: an issue in a private repo, labelled for the desk.
 - [pubcheck.sources](_autosummary/pubcheck.sources.html.md): What the check looks up: a repo’s visibility, the acquaint registry, private companions.
-- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-19 09:07 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
+- [About this build](about-this-build.html.md): This documentation was built on &#42;&#42;2026-11-22 18:44 UTC&#42;&#42; from commit &lt;a href="https://github.com/tho...
 
 ## Optional
 

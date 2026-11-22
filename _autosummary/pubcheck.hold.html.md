@@ -23,6 +23,7 @@ text’s hash, and an open issue with that hash is reused.
 
 | [`PEM_BLOCK`](#pubcheck.hold.PEM_BLOCK)   | A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).   |
 |--------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| [`WITHHELD`](#pubcheck.hold.WITHHELD)    | What a desk item shows instead of a text whose credential only the scanner found.        |
 
 ### Functions
 
@@ -36,6 +37,10 @@ text’s hash, and an open issue with that hash is reused.
 ### pubcheck.hold.PEM_BLOCK *= re.compile('-----BEGIN [A-Z ]\*PRIVATE KEY-----.\*?(?:-----END [A-Z ]\*PRIVATE KEY-----|\\\\Z)', re.DOTALL)*
 
 A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).
+
+### pubcheck.hold.WITHHELD *= '[withheld: a secret scanner found a credential here; read the post at its source]'*
+
+What a desk item shows instead of a text whose credential only the scanner found.
 
 ### pubcheck.hold.file_hold(verdict, , target, text, title=None, more=(), config=None, budget=None)
 

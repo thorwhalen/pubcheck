@@ -56,11 +56,11 @@ Seconds a lookup may take: `cap`, or what is left of the budget when less.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
-#### run(argv, , cap=8.0, stdin=None)
+#### run(argv, , cap=8.0, stdin=None, env=None, cwd=None)
 
 `subprocess.run` within the budget; `None` when out of time or on failure.
 
-### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
+### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'credential_scanner': None, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
 
 The settings and their defaults. Everything that names the operator’s own repos or
 folders is unset by default and lives in their config file, never in this code:
@@ -72,9 +72,12 @@ folders is unset by default and lives in their config file, never in this code:
   (a reference to one is private, and a flag points at the target’s companion);
 - `private_issues`: the private repo for context that has no companion;
 - `private_patterns`: more regexes for private references (working folders, the
-  layout of the operator’s machines), on top of this machine’s home folder.
+  layout of the operator’s machines), on top of this machine’s home folder;
+- `credential_scanner`: an external secret scanner to run beside the built-in
+  credential patterns, e.g. `betterleaks` (unset: none is run). See
+  [`pubcheck.detectors.scanner_credential()`](pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential).
 
-### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
+### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'credential_scanner': 'PUBCHECK_CREDENTIAL_SCANNER', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
 
 config only).
 

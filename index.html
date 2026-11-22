@@ -132,7 +132,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">pubcheck</span><span class="w"> </span><span class="kn">import</span> <span class="n">check</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">v</span> <span class="o">=</span> <span class="n">check</span><span class="p">(</span><span class="s2">"As the owner asked, we fixed it."</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="s2">"octo/app"</span><span class="p">)</span>
-</span><span data-line="4"><span class="n">v</span><span class="o">.</span><span class="n">decision</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">categories</span>   <span class="c1"># ('flag', ['owner-relation'])</span>
+</span><span data-line="4"><span class="n">v</span><span class="o">.</span><span class="n">decision</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">categories</span>  <span class="c1"># ('flag', ['owner-relation'])</span>
 </span></pre></div>
 </div>
 <p>A private target passes untouched. A public one, or one whose visibility is unknown, is scanned for:</p>
@@ -141,7 +141,7 @@ data-aria-dark="Switch to auto color mode">
 <li><p><code class="docutils literal notranslate"><span class="pre">owner-relation</span></code>: the owner’s own preferences, corrections or relations (“the operator stated”, “my agents”);</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">private-ref</span></code>: repos known to be private, private companions, this machine’s home folder, and your own <code class="docutils literal notranslate"><span class="pre">private_patterns</span></code>;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">session-link</span></code>: Claude session links;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">credential</span></code>: credential-shaped strings (the patterns of <code class="docutils literal notranslate"><span class="pre">openloops.egress</span></code>);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">credential</span></code>: credential-shaped strings (the patterns of <code class="docutils literal notranslate"><span class="pre">openloops.egress</span></code>), plus what an external secret scanner finds when you set <code class="docutils literal notranslate"><span class="pre">credential_scanner</span></code>;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mention</span></code>: <code class="docutils literal notranslate"><span class="pre">&#64;login</span></code> and <code class="docutils literal notranslate"><span class="pre">&#64;org/team</span></code> outside code, for an <strong>unattended</strong> writer only, since a mention notifies a person.</p></li>
 </ul>
 <section id="attended-and-unattended-writers">
@@ -196,9 +196,14 @@ data-aria-dark="Switch to auto color mode">
 <td><p>(config only)</p></td>
 <td><p>none: regexes for private references, such as working folders</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">credential_scanner</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PUBCHECK_CREDENTIAL_SCANNER</span></code></p></td>
+<td><p>unset: a gitleaks-compatible scanner to run beside the built-in patterns, e.g. <code class="docutils literal notranslate"><span class="pre">betterleaks</span></code></p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">credential_scanner</span></code> adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to <code class="docutils literal notranslate"><span class="pre">&lt;scanner&gt;</span> <span class="pre">stdin</span></code> with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. It runs once per check over the whole post, from a neutral folder, and only from an absolute path outside the current folder. A scanner that is missing or fails is logged as a gap: an attended check carries on with the built-in patterns (and says so once on stderr), an unattended one is <code class="docutils literal notranslate"><span class="pre">unavailable</span></code> and holds the text. A held post whose credential only the scanner found is filed without its text, since the redaction patterns cannot find that credential. <code class="docutils literal notranslate"><span class="pre">credential_scanner_args</span></code> (config only) replaces the argument list for a scanner whose flags differ.</p>
 </section>
 <section id="caches-and-log">
 <h2>Caches and log<a class="headerlink" href="#caches-and-log" title="Link to this heading">#</a></h2>
@@ -213,7 +218,7 @@ data-aria-dark="Switch to auto color mode">
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-19 09:07 UTC from <a href="https://github.com/thorwhalen/pubcheck/commit/ff1d77672f9e80781e4b0df5a06c6485e311cc01">ff1d776</a> (main) · pubcheck 0.0.1 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 18:44 UTC from <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f">9bf0a6a</a> (main) · pubcheck 0.0.2 · <a href="about-this-build.html">about this build</a></p>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
@@ -248,7 +253,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/documentation_options.js?v=e3a6060d"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>

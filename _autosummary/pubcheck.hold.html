@@ -89,6 +89,7 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#pubcheck.hold.PEM_BLOCK"><code class="docutils literal notranslate"><span class="pre">PEM_BLOCK</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.hold.WITHHELD"><code class="docutils literal notranslate"><span class="pre">WITHHELD</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.hold.file_hold"><code class="docutils literal notranslate"><span class="pre">file_hold()</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.hold.hold_body"><code class="docutils literal notranslate"><span class="pre">hold_body()</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.hold.hold_key"><code class="docutils literal notranslate"><span class="pre">hold_key()</span></code></a></li>
@@ -156,6 +157,9 @@ text’s hash, and an open issue with that hash is reused.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.hold.PEM_BLOCK" title="pubcheck.hold.PEM_BLOCK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PEM_BLOCK</span></code></a></p></td>
 <td><p>A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.hold.WITHHELD" title="pubcheck.hold.WITHHELD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WITHHELD</span></code></a></p></td>
+<td><p>What a desk item shows instead of a text whose credential only the scanner found.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -185,6 +189,12 @@ text’s hash, and an open issue with that hash is reused.</p>
 <dt class="sig sig-object py" id="pubcheck.hold.PEM_BLOCK">
 <span class="sig-prename descclassname"><span class="pre">pubcheck.hold.</span></span><span class="sig-name descname"><span class="pre">PEM_BLOCK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('-----BEGIN</span> <span class="pre">[A-Z</span> <span class="pre">]*PRIVATE</span> <span class="pre">KEY-----.*?(?:-----END</span> <span class="pre">[A-Z</span> <span class="pre">]*PRIVATE</span> <span class="pre">KEY-----|\\Z)',</span> <span class="pre">re.DOTALL)</span></span><a class="headerlink" href="#pubcheck.hold.PEM_BLOCK" title="Link to this definition">#</a></dt>
 <dd><p>A whole PEM private key, BEGIN to END (the shared patterns match only the BEGIN line).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.hold.WITHHELD">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.hold.</span></span><span class="sig-name descname"><span class="pre">WITHHELD</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'[withheld:</span> <span class="pre">a</span> <span class="pre">secret</span> <span class="pre">scanner</span> <span class="pre">found</span> <span class="pre">a</span> <span class="pre">credential</span> <span class="pre">here;</span> <span class="pre">read</span> <span class="pre">the</span> <span class="pre">post</span> <span class="pre">at</span> <span class="pre">its</span> <span class="pre">source]'</span></span><a class="headerlink" href="#pubcheck.hold.WITHHELD" title="Link to this definition">#</a></dt>
+<dd><p>What a desk item shows instead of a text whose credential only the scanner found.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -292,7 +302,7 @@ text’s hash, and an open issue with that hash is reused.</p>
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
