@@ -95,6 +95,7 @@ class Budget:
         cap: float = LOOKUP_TIMEOUT,
         stdin: str | None = None,
         env: Mapping | None = None,
+        cwd: str | None = None,
     ):
         """``subprocess.run`` within the budget; ``None`` when out of time or on failure."""
         left = self.left(cap)
@@ -102,7 +103,13 @@ class Budget:
             return None
         try:
             return subprocess.run(
-                argv, capture_output=True, text=True, timeout=left, input=stdin, env=env
+                argv,
+                capture_output=True,
+                text=True,
+                timeout=left,
+                input=stdin,
+                env=env,
+                cwd=cwd,
             )
         except (OSError, subprocess.SubprocessError):
             return None

@@ -38,13 +38,15 @@ import getpass
 import json
 import os
 import re
+import shlex
 import shutil
 import sys
+import tempfile
 from collections.abc import Callable, Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
 
-from pubcheck.base import Budget
+from pubcheck.base import Budget, log_event
 
 Finding = tuple[str, str]
 Detector = Callable[[str, Mapping], list]
@@ -209,16 +211,27 @@ SCANNER_ENV_DROPPED = ("BETTERLEAKS_VALIDATE", "BETTERLEAKS_ANALYZE")
 SCANNER_TIMEOUT = 5.0
 
 
+class ScannerUnavailable(RuntimeError):
+    """A configured scanner did not run; an unattended check must not pass without it."""
+
+
 def scanner_credential(text, ctx):
     """What an external secret scanner finds, named ``<scanner>:<rule id>``.
 
     Off unless the operator sets ``credential_scanner`` (``betterleaks`` is the one
     weighed in thorwhalen/pubcheck#3; any gitleaks-compatible ``stdin`` command works,
     with ``credential_scanner_args`` for another argument list). It adds the long tail of
-    vendor formats to the built-in :func:`credential`, which stays. The text goes to the
-    scanner on stdin, never in argv; the report is redacted; validation is never asked
-    for. A scanner that is missing, fails or runs out of time finds nothing and says so
-    once on stderr: the built-in patterns still ran.
+    vendor formats to the built-in :func:`credential`, which stays.
+
+    It runs once per check, over every text of the post together (``whole_batch``). The
+    text goes on stdin, never in argv; the report is redacted; validation is never asked
+    for; the scanner runs from a neutral folder, so a repo's own scanner config is not
+    read, and only from an absolute path outside the current folder.
+
+    A scanner that is missing, fails or runs out of time is a gap, logged every time. An
+    attended check carries on with the built-in patterns (and says so once on stderr);
+    an **unattended** one raises :class:`ScannerUnavailable`, so the check is
+    ``unavailable`` and the text is held, as any other lookup that cannot be made.
 
     >>> scanner_credential("AKIA...", {})  # no scanner configured
     []
@@ -227,21 +240,13 @@ def scanner_credential(text, ctx):
     scanner = conf.get("credential_scanner")
     if not scanner:
         return []
-    exe = shutil.which(scanner)
-    if exe is None:
-        _scanner_gap(scanner, "not found on PATH")
-        return []
-    argv = [exe, *(conf.get("credential_scanner_args") or SCANNER_ARGS)]
-    env = {k: v for k, v in os.environ.items() if k not in SCANNER_ENV_DROPPED}
-    budget = ctx.get("budget") or Budget(None)
-    done = budget.run(argv, cap=SCANNER_TIMEOUT, stdin=text, env=env)
-    if done is None:
-        _scanner_gap(scanner, "failed or ran out of time")
-        return []
     try:
-        report = json.loads(done.stdout or "[]")
-    except ValueError:
-        _scanner_gap(scanner, f"exited {done.returncode} without a JSON report")
+        report = _run_scanner(scanner, conf, text, ctx)
+    except ScannerUnavailable as gap:
+        log_event(writer="pubcheck", event="credential_scanner_gap", reason=str(gap))
+        if ctx.get("unattended"):
+            raise
+        _say_once(str(gap))
         return []
     name = Path(scanner).name
     return [
@@ -251,11 +256,68 @@ def scanner_credential(text, ctx):
     ]
 
 
+scanner_credential.whole_batch = True
+
+
+def _run_scanner(scanner, conf, text, ctx) -> list:
+    """The scanner's findings for ``text``; raises :class:`ScannerUnavailable` on any gap."""
+    if not isinstance(scanner, str):
+        raise ScannerUnavailable("credential_scanner must be a command name or path")
+    args = conf.get("credential_scanner_args") or SCANNER_ARGS
+    if isinstance(args, str):
+        args = shlex.split(args)
+    if not all(isinstance(a, str) for a in args):
+        raise ScannerUnavailable("credential_scanner_args must be a list of strings")
+    exe = shutil.which(scanner)
+    if exe is None:
+        raise ScannerUnavailable(f"credential_scanner {scanner!r} not found")
+    exe = os.path.realpath(exe)
+    here = os.path.realpath(os.getcwd())
+    if exe.startswith(here + os.sep):
+        raise ScannerUnavailable(
+            f"credential_scanner {scanner!r} resolves inside the current folder; refused"
+        )
+    env = {k: v for k, v in os.environ.items() if k not in SCANNER_ENV_DROPPED}
+    budget = ctx.get("budget") or Budget(None)
+    done = budget.run(
+        [exe, *args], cap=SCANNER_TIMEOUT, stdin=text, env=env, cwd=tempfile.gettempdir()
+    )
+    if done is None:
+        raise ScannerUnavailable(f"credential_scanner {scanner!r} failed or ran out of time")
+    if done.returncode != 0:
+        raise ScannerUnavailable(f"credential_scanner {scanner!r} exited {done.returncode}")
+    try:
+        report = json.loads(done.stdout)
+    except ValueError:
+        raise ScannerUnavailable(
+            f"credential_scanner {scanner!r} printed no JSON report"
+        ) from None
+    if report is None:  # Go encodes an empty slice as null
+        return []
+    if not isinstance(report, list):
+        raise ScannerUnavailable(f"credential_scanner {scanner!r} printed no list")
+    return report
+
+
+def is_scanner_finding(finding) -> bool:
+    """True for a credential an external scanner found (its term is ``<scanner>:<rule>``).
+
+    The built-in patterns name their findings without a colon, and only they are known
+    to :func:`pubcheck.hold.redact`.
+
+    >>> is_scanner_finding(("credential", "betterleaks:slack-webhook-url"))
+    True
+    >>> is_scanner_finding(("credential", "github_token"))
+    False
+    """
+    category, term = finding
+    return category == "credential" and ":" in term
+
+
 @lru_cache(maxsize=None)
-def _scanner_gap(scanner: str, why: str) -> None:
-    """Say once per process that the configured scanner did not run."""
-    print(f"pubcheck: credential_scanner {scanner!r} {why}; built-in patterns only",
-          file=sys.stderr)
+def _say_once(why: str) -> None:
+    """Say once per process, on stderr, that an attended check ran without the scanner."""
+    print(f"pubcheck: {why}; built-in credential patterns only", file=sys.stderr)
 
 
 def mention(text, ctx):
@@ -280,9 +342,11 @@ UNATTENDED_DETECTORS: tuple[Detector, ...] = DETECTORS + (mention,)
 def findings(texts: Iterable[str], ctx: Mapping, *, detectors=DETECTORS) -> list[Finding]:
     """``[(category, term)]``, each once, found by ``detectors`` in any of ``texts``."""
     seen: list[Finding] = []
-    for text in texts:
-        text = re.sub(r"\s+", " ", text or "")
-        for detect in detectors:
+    texts = [re.sub(r"\s+", " ", text or "") for text in texts]
+    for detect in detectors:
+        # a detector that starts a process sees the whole post once, not text by text
+        batches = ["\n".join(texts)] if getattr(detect, "whole_batch", False) else texts
+        for text in batches:
             for hit in detect(text, ctx):
                 if hit not in seen:
                     seen.append(hit)

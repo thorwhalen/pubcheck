@@ -52,7 +52,7 @@ With `hold_repo` set, a held post is filed as an issue in that private repo with
 | `private_patterns` | (config only) | none: regexes for private references, such as working folders |
 | `credential_scanner` | `PUBCHECK_CREDENTIAL_SCANNER` | unset: a gitleaks-compatible scanner to run beside the built-in patterns, e.g. `betterleaks` |
 
-`credential_scanner` adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to `<scanner> stdin` with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. A scanner that is missing or fails adds nothing and says so once on stderr. `credential_scanner_args` (config only) replaces the argument list for a scanner whose flags differ.
+`credential_scanner` adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to `<scanner> stdin` with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. It runs once per check over the whole post, from a neutral folder, and only from an absolute path outside the current folder. A scanner that is missing or fails is logged as a gap: an attended check carries on with the built-in patterns (and says so once on stderr), an unattended one is `unavailable` and holds the text. A held post whose credential only the scanner found is filed without its text, since the redaction patterns cannot find that credential. `credential_scanner_args` (config only) replaces the argument list for a scanner whose flags differ.
 
 ## Caches and log
 
