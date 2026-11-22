@@ -283,9 +283,13 @@ def _run_scanner(scanner, conf, text, ctx) -> list:
         [exe, *args], cap=SCANNER_TIMEOUT, stdin=text, env=env, cwd=tempfile.gettempdir()
     )
     if done is None:
-        raise ScannerUnavailable(f"credential_scanner {scanner!r} failed or ran out of time")
+        raise ScannerUnavailable(
+            f"credential_scanner {scanner!r} failed or ran out of time"
+        )
     if done.returncode != 0:
-        raise ScannerUnavailable(f"credential_scanner {scanner!r} exited {done.returncode}")
+        raise ScannerUnavailable(
+            f"credential_scanner {scanner!r} exited {done.returncode}"
+        )
     try:
         report = json.loads(done.stdout)
     except ValueError:

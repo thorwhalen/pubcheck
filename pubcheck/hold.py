@@ -37,7 +37,9 @@ PEM_BLOCK = re.compile(
 
 
 #: What a desk item shows instead of a text whose credential only the scanner found.
-WITHHELD = "[withheld: a secret scanner found a credential here; read the post at its source]"
+WITHHELD = (
+    "[withheld: a secret scanner found a credential here; read the post at its source]"
+)
 
 
 def redact(text: str) -> str:
