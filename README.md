@@ -21,7 +21,7 @@ A private target passes untouched. A public one, or one whose visibility is unkn
 - `owner-relation`: the owner's own preferences, corrections or relations ("the operator stated", "my agents");
 - `private-ref`: repos known to be private, private companions, this machine's home folder, and your own `private_patterns`;
 - `session-link`: Claude session links;
-- `credential`: credential-shaped strings (the patterns of `openloops.egress`);
+- `credential`: credential-shaped strings (the patterns of `openloops.egress`), plus what an external secret scanner finds when you set `credential_scanner`;
 - `mention`: `@login` and `@org/team` outside code, for an **unattended** writer only, since a mention notifies a person.
 
 ## Attended and unattended writers
@@ -50,6 +50,9 @@ With `hold_repo` set, a held post is filed as an issue in that private repo with
 | `private_owner` | `PUBCHECK_PRIVATE_OWNER` | unset: the account whose `<owner>/_<name>` repos are private companions |
 | `private_issues` | `PUBCHECK_PRIVATE_ISSUES` | unset: where context with no companion goes |
 | `private_patterns` | (config only) | none: regexes for private references, such as working folders |
+| `credential_scanner` | `PUBCHECK_CREDENTIAL_SCANNER` | unset: a gitleaks-compatible scanner to run beside the built-in patterns, e.g. `betterleaks` |
+
+`credential_scanner` adds the long tail of vendor key formats (betterleaks ships several hundred rules) to the built-in patterns, which stay. The text is piped to `<scanner> stdin` with the report redacted, and live validation is never requested, since checking whether a key works means sending it to its vendor. A scanner that is missing or fails adds nothing and says so once on stderr. `credential_scanner_args` (config only) replaces the argument list for a scanner whose flags differ.
 
 ## Caches and log
 

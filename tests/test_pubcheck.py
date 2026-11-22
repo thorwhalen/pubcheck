@@ -435,3 +435,69 @@ def test_before_send_through_correspond_check(env):
         lines, stopped = outbound.check(ref, Draft(text="Ada Quill asked"), dry_run=True,
                                         before_send=make_before_send())
     assert stopped is not None and stopped.error_kind == "needs_approval"
+
+
+# -- the opt-in external scanner beside the built-in credential patterns (#3) --
+
+
+def _fake_scanner(tmp_path, report, *, exit_code=0):
+    """A scanner on PATH that records its argv, stdin and env, and prints ``report``."""
+    script = tmp_path / "fakescan"
+    log = tmp_path / "fakescan.log"
+    script.write_text(
+        "#!/usr/bin/env python3\n"
+        "import json, os, sys\n"
+        f"open({str(log)!r}, 'w').write(json.dumps({{'argv': sys.argv[1:], "
+        "'stdin': sys.stdin.read(), 'validate': os.environ.get('BETTERLEAKS_VALIDATE')}))\n"
+        f"print({report!r})\n"
+        f"sys.exit({exit_code})\n"
+    )
+    script.chmod(0o755)
+    return script, log
+
+
+def test_scanner_is_off_unless_configured():
+    assert d.scanner_credential("anything", {"settings": {}}) == []
+    assert d.scanner_credential in d.DETECTORS
+
+
+def test_scanner_findings_are_named_by_rule_and_never_carry_the_secret(
+    tmp_path, monkeypatch
+):
+    report = json.dumps([{"RuleID": "slack-webhook-url", "Secret": "REDACTED"}])
+    script, log = _fake_scanner(tmp_path, report)
+    monkeypatch.setenv("PATH", f"{tmp_path}{os.pathsep}{os.environ['PATH']}")
+    monkeypatch.setenv("BETTERLEAKS_VALIDATE", "true")
+    ctx = {"settings": {"credential_scanner": "fakescan"}}
+    assert d.scanner_credential("the text", ctx) == [
+        ("credential", "fakescan:slack-webhook-url")
+    ]
+    seen = json.loads(log.read_text())
+    assert seen["stdin"] == "the text"  # the text goes on stdin, never in argv
+    assert "the text" not in seen["argv"]
+    assert "--redact" in seen["argv"] and "--report-path" in seen["argv"]
+    assert not any("valid" in a for a in seen["argv"])
+    assert seen["validate"] is None  # an inherited switch to live validation is dropped
+
+
+@pytest.mark.parametrize("report", ["not json", "[]"])
+def test_a_scanner_that_finds_nothing_or_fails_adds_nothing(tmp_path, monkeypatch, report):
+    _fake_scanner(tmp_path, report, exit_code=2)
+    monkeypatch.setenv("PATH", f"{tmp_path}{os.pathsep}{os.environ['PATH']}")
+    assert d.scanner_credential("x", {"settings": {"credential_scanner": "fakescan"}}) == []
+
+
+def test_a_missing_scanner_is_reported_not_fatal(capsys):
+    d._scanner_gap.cache_clear()
+    ctx = {"settings": {"credential_scanner": "no-such-scanner-xyz"}}
+    assert d.scanner_credential("x", ctx) == []
+    assert "no-such-scanner-xyz" in capsys.readouterr().err
+
+
+def test_the_scanner_is_a_setting_with_an_environment_override(monkeypatch):
+    from pubcheck.base import settings
+
+    monkeypatch.setenv("PUBCHECK_CONFIG", "/nonexistent/config.toml")
+    assert settings()["credential_scanner"] is None
+    monkeypatch.setenv("PUBCHECK_CREDENTIAL_SCANNER", "betterleaks")
+    assert settings()["credential_scanner"] == "betterleaks"

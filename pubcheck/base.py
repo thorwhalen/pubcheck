@@ -52,7 +52,10 @@ CONFIG_FILE = "~/.config/pubcheck/config.toml"
 #:   (a reference to one is private, and a flag points at the target's companion);
 #: - ``private_issues``: the private repo for context that has no companion;
 #: - ``private_patterns``: more regexes for private references (working folders, the
-#:   layout of the operator's machines), on top of this machine's home folder.
+#:   layout of the operator's machines), on top of this machine's home folder;
+#: - ``credential_scanner``: an external secret scanner to run beside the built-in
+#:   credential patterns, e.g. ``betterleaks`` (unset: none is run). See
+#:   :func:`pubcheck.detectors.scanner_credential`.
 DFLT_SETTINGS = {
     "hold_repo": None,
     "hold_label": "escalate",
@@ -60,6 +63,7 @@ DFLT_SETTINGS = {
     "private_owner": None,
     "private_issues": None,
     "private_patterns": (),
+    "credential_scanner": None,
 }
 #: The environment variable that overrides each setting (``private_patterns``: config only).
 SETTINGS_ENV = {
@@ -68,6 +72,7 @@ SETTINGS_ENV = {
     "budget_seconds": "PUBCHECK_BUDGET_SECONDS",
     "private_owner": "PUBCHECK_PRIVATE_OWNER",
     "private_issues": "PUBCHECK_PRIVATE_ISSUES",
+    "credential_scanner": "PUBCHECK_CREDENTIAL_SCANNER",
 }
 
 
@@ -83,14 +88,21 @@ class Budget:
             return cap
         return min(cap, self.deadline - time.monotonic())
 
-    def run(self, argv, *, cap: float = LOOKUP_TIMEOUT, stdin: str | None = None):
+    def run(
+        self,
+        argv,
+        *,
+        cap: float = LOOKUP_TIMEOUT,
+        stdin: str | None = None,
+        env: Mapping | None = None,
+    ):
         """``subprocess.run`` within the budget; ``None`` when out of time or on failure."""
         left = self.left(cap)
         if left <= 0.05:
             return None
         try:
             return subprocess.run(
-                argv, capture_output=True, text=True, timeout=left, input=stdin
+                argv, capture_output=True, text=True, timeout=left, input=stdin, env=env
             )
         except (OSError, subprocess.SubprocessError):
             return None

@@ -17,7 +17,9 @@ and the log never holds it). A credential's term is its pattern name, never the 
   ``private_patterns`` (``ctx["private_patterns"]``, from the settings);
 - ``session-link``: ``claude.ai/code/session_…`` (not on commits, whose session links a
   commit hook strips);
-- ``credential``: a credential-shaped string (:func:`openloops.egress.find_credentials`);
+- ``credential``: a credential-shaped string (:func:`openloops.egress.find_credentials`),
+  and, when the operator sets ``credential_scanner``, what that external scanner finds
+  (:func:`scanner_credential`);
 - ``mention``: an ``@login`` or ``@org/team`` outside code, which notifies a person:
   sending it is messaging them. Only in :data:`UNATTENDED_DETECTORS`, since an attended
   author chose to notify.
@@ -33,11 +35,16 @@ and the log never holds it). A credential's term is its pattern name, never the 
 from __future__ import annotations
 
 import getpass
+import json
 import os
 import re
+import shutil
+import sys
 from collections.abc import Callable, Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
+
+from pubcheck.base import Budget
 
 Finding = tuple[str, str]
 Detector = Callable[[str, Mapping], list]
@@ -182,6 +189,75 @@ def credential(text, ctx):
     return [("credential", name) for name, _ in find_credentials(text)]
 
 
+#: The arguments of a gitleaks-compatible scanner's ``stdin`` command (betterleaks 1.x and
+#: gitleaks 8 share them): a JSON report on stdout, the secret redacted, exit 0 on a find.
+#: Never a validation flag: checking whether a credential is live sends it to its vendor.
+SCANNER_ARGS = (
+    "stdin",
+    "--report-format",
+    "json",
+    "--report-path",
+    "-",
+    "--no-banner",
+    "--redact",
+    "--exit-code",
+    "0",
+)
+#: Environment variables that would switch a scanner's live validation on; never passed.
+SCANNER_ENV_DROPPED = ("BETTERLEAKS_VALIDATE", "BETTERLEAKS_ANALYZE")
+#: Seconds the scanner may take, within what is left of the check's budget.
+SCANNER_TIMEOUT = 5.0
+
+
+def scanner_credential(text, ctx):
+    """What an external secret scanner finds, named ``<scanner>:<rule id>``.
+
+    Off unless the operator sets ``credential_scanner`` (``betterleaks`` is the one
+    weighed in thorwhalen/pubcheck#3; any gitleaks-compatible ``stdin`` command works,
+    with ``credential_scanner_args`` for another argument list). It adds the long tail of
+    vendor formats to the built-in :func:`credential`, which stays. The text goes to the
+    scanner on stdin, never in argv; the report is redacted; validation is never asked
+    for. A scanner that is missing, fails or runs out of time finds nothing and says so
+    once on stderr: the built-in patterns still ran.
+
+    >>> scanner_credential("AKIA...", {})  # no scanner configured
+    []
+    """
+    conf = ctx.get("settings") or {}
+    scanner = conf.get("credential_scanner")
+    if not scanner:
+        return []
+    exe = shutil.which(scanner)
+    if exe is None:
+        _scanner_gap(scanner, "not found on PATH")
+        return []
+    argv = [exe, *(conf.get("credential_scanner_args") or SCANNER_ARGS)]
+    env = {k: v for k, v in os.environ.items() if k not in SCANNER_ENV_DROPPED}
+    budget = ctx.get("budget") or Budget(None)
+    done = budget.run(argv, cap=SCANNER_TIMEOUT, stdin=text, env=env)
+    if done is None:
+        _scanner_gap(scanner, "failed or ran out of time")
+        return []
+    try:
+        report = json.loads(done.stdout or "[]")
+    except ValueError:
+        _scanner_gap(scanner, f"exited {done.returncode} without a JSON report")
+        return []
+    name = Path(scanner).name
+    return [
+        ("credential", f"{name}:{f.get('RuleID') or 'unknown'}")
+        for f in report
+        if isinstance(f, Mapping)
+    ]
+
+
+@lru_cache(maxsize=None)
+def _scanner_gap(scanner: str, why: str) -> None:
+    """Say once per process that the configured scanner did not run."""
+    print(f"pubcheck: credential_scanner {scanner!r} {why}; built-in patterns only",
+          file=sys.stderr)
+
+
 def mention(text, ctx):
     """``@login`` and ``@org/team`` outside code spans and blocks: each notifies someone."""
     bare = _CODE.sub(" ", text)
@@ -195,6 +271,7 @@ DETECTORS: tuple[Detector, ...] = (
     private_ref,
     session_link,
     credential,
+    scanner_credential,
 )
 #: An unattended writer also holds every @mention: nobody chose to notify that person.
 UNATTENDED_DETECTORS: tuple[Detector, ...] = DETECTORS + (mention,)
