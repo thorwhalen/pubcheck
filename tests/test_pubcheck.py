@@ -435,3 +435,135 @@ def test_before_send_through_correspond_check(env):
         lines, stopped = outbound.check(ref, Draft(text="Ada Quill asked"), dry_run=True,
                                         before_send=make_before_send())
     assert stopped is not None and stopped.error_kind == "needs_approval"
+
+
+# -- the opt-in external scanner beside the built-in credential patterns (#3) --
+
+
+@pytest.fixture
+def scan_env(tmp_path, monkeypatch):
+    """A fake scanner on PATH (outside the cwd), and a private state dir for the log."""
+    bin_dir, state = tmp_path / "scanbin", tmp_path / "state"
+    bin_dir.mkdir()
+    monkeypatch.setenv(STATE_DIR_ENV, str(state))
+    monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ['PATH']}")
+    (tmp_path / "cwd").mkdir()
+    monkeypatch.chdir(tmp_path / "cwd")  # the cwd does not hold the scanner
+    d._say_once.cache_clear()
+
+    def make(stdout, *, exit_code=0, sleep=0):
+        log = tmp_path / "fakescan.log"
+        script = bin_dir / "fakescan"
+        script.write_text(
+            "#!/usr/bin/env python3\n"
+            "import json, os, sys, time\n"
+            f"time.sleep({sleep})\n"
+            f"open({str(log)!r}, 'a').write(json.dumps({{'argv': sys.argv[1:], "
+            "'stdin': sys.stdin.read(), 'cwd': os.getcwd(), "
+            "'validate': os.environ.get('BETTERLEAKS_VALIDATE')}) + '\\n')\n"
+            f"sys.stdout.write({stdout!r})\n"
+            f"sys.exit({exit_code})\n"
+        )
+        script.chmod(0o755)
+        return log
+
+    make.state = state
+    return make
+
+
+def _ctx(**kw):
+    return {"settings": {"credential_scanner": "fakescan"}, **kw}
+
+
+def test_scanner_is_off_unless_configured():
+    assert d.scanner_credential("anything", {"settings": {}}) == []
+    assert d.scanner_credential in d.DETECTORS
+
+
+def test_scanner_findings_are_named_by_rule_and_never_carry_the_secret(
+    scan_env, monkeypatch
+):
+    log = scan_env(json.dumps([{"RuleID": "slack-webhook-url", "Secret": "REDACTED"}]))
+    monkeypatch.setenv("BETTERLEAKS_VALIDATE", "true")
+    assert d.scanner_credential("the text", _ctx()) == [
+        ("credential", "fakescan:slack-webhook-url")
+    ]
+    seen = json.loads(log.read_text())
+    assert seen["stdin"] == "the text"  # on stdin, never in argv
+    assert "the text" not in seen["argv"]
+    assert "--redact" in seen["argv"] and "--report-path" in seen["argv"]
+    assert not any("valid" in a for a in seen["argv"])
+    assert seen["validate"] is None  # an inherited switch to live validation is dropped
+    assert seen["cwd"] != os.getcwd()  # a repo's own scanner config is not picked up
+
+
+def test_the_scanner_runs_once_per_check_over_every_text(scan_env):
+    log = scan_env("[]")
+    d.findings(["title", "body", "label-a", "label-b"], _ctx())
+    runs = log.read_text().splitlines()
+    assert len(runs) == 1 and json.loads(runs[0])["stdin"] == "title\nbody\nlabel-a\nlabel-b"
+
+
+@pytest.mark.parametrize("stdout", ["[]", "null"])
+def test_an_empty_report_finds_nothing(scan_env, stdout):
+    scan_env(stdout)
+    assert d.scanner_credential("x", _ctx()) == []
+
+
+@pytest.mark.parametrize(
+    "stdout, exit_code", [("not json", 0), ("", 3), ("42", 0), ("[]", 2)]
+)
+def test_a_failed_scan_is_a_gap_attended_and_a_hold_unattended(
+    scan_env, capsys, stdout, exit_code
+):
+    scan_env(stdout, exit_code=exit_code)
+    assert d.scanner_credential("x", _ctx()) == []  # attended: built-in patterns only
+    assert "fakescan" in capsys.readouterr().err
+    with pytest.raises(d.ScannerUnavailable):
+        d.scanner_credential("x", _ctx(unattended=True))
+    events = (scan_env.state / "events.jsonl").read_text().splitlines()
+    assert len(events) == 2 and all("credential_scanner_gap" in e for e in events)
+
+
+def test_a_missing_or_malformed_scanner_setting_is_a_gap(scan_env):
+    assert d.scanner_credential("x", {"settings": {"credential_scanner": "nope-xyz"}}) == []
+    with pytest.raises(d.ScannerUnavailable):
+        d.scanner_credential(
+            "x", {"settings": {"credential_scanner": 42}, "unattended": True}
+        )
+    with pytest.raises(d.ScannerUnavailable):
+        d.scanner_credential(
+            "x",
+            {"settings": {"credential_scanner": "fakescan",
+                          "credential_scanner_args": [1, 2]}, "unattended": True},
+        )
+
+
+def test_a_scanner_inside_the_current_folder_is_refused(scan_env, tmp_path, monkeypatch):
+    local = tmp_path / "repo" / "bin"
+    local.mkdir(parents=True)
+    (local / "fakescan").write_text("#!/bin/sh\necho []\n")
+    (local / "fakescan").chmod(0o755)
+    monkeypatch.chdir(tmp_path / "repo")
+    monkeypatch.setenv("PATH", f"{local}{os.pathsep}{os.environ['PATH']}")
+    with pytest.raises(d.ScannerUnavailable, match="inside the current folder"):
+        d.scanner_credential("x", _ctx(unattended=True))
+
+
+def test_a_hold_never_copies_a_credential_only_the_scanner_found():
+    from pubcheck.core import Verdict
+    from pubcheck.hold import WITHHELD, hold_body
+
+    secret = "https://hooks.example.invalid/services/T000/B000/" + "x" * 24
+    v = Verdict(decision="flag", findings=[("credential", "fakescan:slack-webhook-url")])
+    body = hold_body(v, target="github:o/r", text=f"see {secret}", title=secret, more=[secret])
+    assert secret not in body and WITHHELD in body
+
+
+def test_the_scanner_is_a_setting_with_an_environment_override(monkeypatch):
+    from pubcheck.base import settings
+
+    monkeypatch.setenv("PUBCHECK_CONFIG", "/nonexistent/config.toml")
+    assert settings()["credential_scanner"] is None
+    monkeypatch.setenv("PUBCHECK_CREDENTIAL_SCANNER", "betterleaks")
+    assert settings()["credential_scanner"] == "betterleaks"

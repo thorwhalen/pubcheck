@@ -23,6 +23,7 @@ import shutil
 from collections.abc import Mapping, Sequence
 
 from pubcheck.base import Budget, settings, text_hash
+from pubcheck.detectors import is_scanner_finding
 from pubcheck.core import HINTS, Verdict
 from pubcheck.sources import gh_repo_view
 
@@ -33,6 +34,10 @@ MARKER = "pubcheck-hold"
 PEM_BLOCK = re.compile(
     r"-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(?:-----END [A-Z ]*PRIVATE KEY-----|\Z)", re.S
 )
+
+
+#: What a desk item shows instead of a text whose credential only the scanner found.
+WITHHELD = "[withheld: a secret scanner found a credential here; read the post at its source]"
 
 
 def redact(text: str) -> str:
@@ -78,6 +83,10 @@ def hold_body(
         if verdict.decision == "flag"
         else [f"- the check was unavailable: {verdict.reason}"]
     )
+    if any(is_scanner_finding(f) for f in verdict.findings):
+        # a credential only the external scanner knows: redact() cannot find it, so the
+        # text is not copied at all
+        text, title, more = WITHHELD, (WITHHELD if title else title), ()
     text, title = redact(text), redact(title) if title else title
     also = (
         [f"**Also published with it:** {', '.join(redact(m) for m in more)}", ""]
