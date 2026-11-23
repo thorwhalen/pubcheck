@@ -41,6 +41,8 @@ LOOKUP_TIMEOUT = 8.0
 FINISH_RESERVE = 1.0
 #: A check slower than this (seconds) logs what its lookups cost, to find the slow one.
 SLOW_CHECK = 3.0
+#: Seconds to reap a killed lookup (its pipes may be held by a process outside its group).
+REAP_SECONDS = 0.2
 CACHE_DIR_ENV = "PUBLIC_TEXT_GUARD_CACHE_DIR"
 CACHE_DIR = "~/.cache/public-text-guard"
 STATE_DIR_ENV = "PUBLIC_TEXT_GUARD_STATE_DIR"
@@ -113,7 +115,9 @@ class Budget:
 
         The lookup runs in its own process group, and running out of time kills the whole
         group: a program that started helpers of its own leaves none behind, still holding
-        the machine, once the check has given up on it.
+        the machine, once the check has given up on it. The trade-off: a caller that kills the check
+        itself (rather than giving it a ``--deadline``) does not reach a lookup in flight,
+        which runs on until its own end.
         """
         label = _lookup_label(argv)
         left = self.left(cap)
@@ -177,7 +181,7 @@ def _kill_group(proc) -> None:
         except OSError:
             pass
     try:
-        proc.communicate(timeout=1)
+        proc.communicate(timeout=REAP_SECONDS)
     except (OSError, ValueError, subprocess.SubprocessError):
         pass
 

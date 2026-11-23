@@ -127,7 +127,12 @@ def main(argv=None) -> int:
         if args.hold and verdict.held:
             from pubcheck.hold import file_hold
 
-            filed = file_hold(verdict, target=args.hold, text=text, title=args.title)
+            from pubcheck.base import Budget
+
+            left = effective_budget(args.budget, args.deadline, started=_STARTED)
+            filed = file_hold(
+                verdict, target=args.hold, text=text, title=args.title, budget=Budget(left)
+            )
             out["desk_item"] = filed.get("url") or f"not filed: {filed.get('reason')}"
         print(json.dumps(out))
         return verdict.exit_code

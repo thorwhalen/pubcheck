@@ -116,6 +116,8 @@ class Verdict:
         if not self.findings:
             if self.visibility == "private":
                 return f"{self.repo} is private: nothing is scanned."
+            if self.registry == "unavailable":
+                return "Nothing found (the name registry was unavailable, so names were not checked)."
             return "Nothing found."
         lines = [
             f"{self.repo or 'an unknown (so presumed public) repo'} is public, and the text:"
@@ -207,6 +209,7 @@ def check(
         context=context,
     )
     elapsed = time.monotonic() - started
+    _SLOW_KEYS = {"writer", "event", "surface", "repo", "decision", "seconds", "budget", "lookups"}
     if log and (b.strained or elapsed > SLOW_CHECK):
         log_event(
             writer=writer,
@@ -217,7 +220,7 @@ def check(
             seconds=round(elapsed, 2),
             budget=conf["budget_seconds"],
             lookups=b.report(),
-            **dict(context or {}),
+            **{k: v for k, v in (context or {}).items() if k not in _SLOW_KEYS},
         )
     return verdict
 

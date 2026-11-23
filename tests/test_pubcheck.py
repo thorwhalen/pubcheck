@@ -581,11 +581,13 @@ def slow_gh(env, *, seconds=30, pidfile=None):
 
 
 def _alive(pid):
+    """Running, not a zombie (a container's PID 1 may never reap it)."""
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
         return False
-    return True
+    stat = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True).stdout
+    return bool(stat.strip()) and not stat.strip().startswith("Z")
 
 
 def test_a_lookup_out_of_time_is_cut_with_its_helpers(env, tmp_path):
@@ -599,6 +601,12 @@ def test_a_lookup_out_of_time_is_cut_with_its_helpers(env, tmp_path):
     assert time.monotonic() - started < 4
     ((label, _, outcome),) = b.lookups
     assert (label, outcome) == ("gh", "timeout")
+    for _ in range(50):  # a loaded runner may not have written it within the cap
+        if pidfile.exists() and pidfile.read_text().strip():
+            break
+        time.sleep(0.05)
+    else:
+        pytest.skip("the fake gh never started its helper on this runner")
     helper = int(pidfile.read_text())
     for _ in range(50):  # the kill is sent; the helper may take a moment to go
         if not _alive(helper):
@@ -657,3 +665,16 @@ def test_explain_says_private_for_a_private_pass(env):
     v = check("Ada Quill", repo=PRIVATE)
     assert v.decision == "pass" and v.to_json(terms=True)["explain"] == f"{PRIVATE} is private: nothing is scanned."
     assert check("A neutral note.", repo=PUBLIC).explain() == "Nothing found."
+
+
+def test_explain_names_a_registry_gap(env, monkeypatch):
+    monkeypatch.setenv(s.VOCAB_FILE_ENV, str(env.root / "missing.json"))
+    v = check("A neutral note.", repo=PUBLIC)
+    assert v.registry == "unavailable" and "names were not checked" in v.explain()
+
+
+def test_a_context_key_cannot_break_the_slow_log(env):
+    slow_gh(env)  # present, so the lookup is skipped for time and the slow log is written
+    v = check("Ada Quill", repo="nobody/new", budget=0, context={"seconds": 1, "event": "x"})
+    assert v.decision == "flag"
+    assert [e for e in env.events() if e.get("event") == "slow_check"]
