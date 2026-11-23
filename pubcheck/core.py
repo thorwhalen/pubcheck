@@ -209,7 +209,16 @@ def check(
         context=context,
     )
     elapsed = time.monotonic() - started
-    _SLOW_KEYS = {"writer", "event", "surface", "repo", "decision", "seconds", "budget", "lookups"}
+    _SLOW_KEYS = {
+        "writer",
+        "event",
+        "surface",
+        "repo",
+        "decision",
+        "seconds",
+        "budget",
+        "lookups",
+    }
     if log and (b.strained or elapsed > SLOW_CHECK):
         log_event(
             writer=writer,
@@ -248,6 +257,7 @@ def _judge(
     verdict = Verdict(
         "pass", repo=repo or "", unattended=unattended, text_hash=text_hash(*texts)
     )
+
     def logged(decision_name, **extra):
         if log:
             log_event(
