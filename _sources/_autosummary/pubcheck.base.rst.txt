@@ -8,6 +8,9 @@ pubcheck.base
 
    .. autosummary::
    
+      FINISH_RESERVE
+      SLOW_CHECK
+      REAP_SECONDS
       DFLT_SETTINGS
       SETTINGS_ENV
    

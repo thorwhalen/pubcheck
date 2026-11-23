@@ -152,7 +152,7 @@ data-aria-dark="Switch to auto color mode">
 <h2>Three ways in, one check<a class="headerlink" href="#three-ways-in-one-check" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p><strong>Python</strong>: <code class="docutils literal notranslate"><span class="pre">pubcheck.check(text,</span> <span class="pre">repo=...,</span> <span class="pre">title=...,</span> <span class="pre">unattended=...)</span></code> returns a <code class="docutils literal notranslate"><span class="pre">Verdict</span></code>.</p></li>
-<li><p><strong>CLI</strong>: <code class="docutils literal notranslate"><span class="pre">public-text-guard</span> <span class="pre">check</span> <span class="pre">--repo</span> <span class="pre">OWNER/REPO</span> <span class="pre">[--unattended]</span> <span class="pre">[--title</span> <span class="pre">T]</span> <span class="pre">[--hold</span> <span class="pre">TARGET]</span> <span class="pre">[--terms]</span></code>, the text on stdin. <code class="docutils literal notranslate"><span class="pre">--terms</span></code> adds the matched terms, for a local author who has to reword; <code class="docutils literal notranslate"><span class="pre">--hold</span></code> files a held post as a desk item.</p></li>
+<li><p><strong>CLI</strong>: <code class="docutils literal notranslate"><span class="pre">public-text-guard</span> <span class="pre">check</span> <span class="pre">--repo</span> <span class="pre">OWNER/REPO</span> <span class="pre">[--unattended]</span> <span class="pre">[--title</span> <span class="pre">T]</span> <span class="pre">[--hold</span> <span class="pre">TARGET]</span> <span class="pre">[--terms]</span></code>, the text on stdin. <code class="docutils literal notranslate"><span class="pre">--terms</span></code> adds the matched terms, for a local author who has to reword; <code class="docutils literal notranslate"><span class="pre">--hold</span></code> files a held post as a desk item. <code class="docutils literal notranslate"><span class="pre">--deadline</span> <span class="pre">UNIX_TIME</span></code> is when the caller gives up (a hook that kills the command at a timeout passes it): the check counts its budget from its own start and answers a second before the earlier of the two, so a loaded machine gets a verdict instead of a killed process. A check that ran out of time, or took over 3 s, logs what each lookup cost (<code class="docutils literal notranslate"><span class="pre">slow_check</span></code>, program names and seconds only).</p></li>
 <li><p><strong>correspond</strong>: at the top of <code class="docutils literal notranslate"><span class="pre">~/.config/correspond/config.toml</span></code>, <code class="docutils literal notranslate"><span class="pre">before_send</span> <span class="pre">=</span> <span class="pre">&quot;pubcheck.correspond:before_send&quot;</span></code>. Every write to a public audience is checked unattended; a held one raises correspond’s <code class="docutils literal notranslate"><span class="pre">NeedsApproval</span></code> with the categories, and on a real send (not a dry run) becomes a desk item.</p></li>
 </ul>
 </section>
@@ -218,7 +218,7 @@ data-aria-dark="Switch to auto color mode">
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 18:44 UTC from <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f">9bf0a6a</a> (main) · pubcheck 0.0.2 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 07:02 UTC from <a href="https://github.com/thorwhalen/pubcheck/commit/3704c173ffd7620f916690ba0c890c9c15df3a8c">3704c17</a> (main) · pubcheck 0.0.3 · <a href="about-this-build.html">about this build</a></p>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
@@ -253,7 +253,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="_static/documentation_options.js?v=47de8214"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>

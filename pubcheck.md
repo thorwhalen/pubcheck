@@ -1,4 +1,4 @@
-> built 2026-11-22 18:44 UTC from 9bf0a6a (main) · pubcheck 0.0.2. Details: build_info.json
+> built 2026-11-23 07:02 UTC from 3704c17 (main) · pubcheck 0.0.3. Details: build_info.json
 
 # index.html.md
 
@@ -37,7 +37,7 @@ An attended writer (an agent session someone is driving) proceeds without the re
 ## Three ways in, one check
 
 - **Python**: `pubcheck.check(text, repo=..., title=..., unattended=...)` returns a `Verdict`.
-- **CLI**: `public-text-guard check --repo OWNER/REPO [--unattended] [--title T] [--hold TARGET] [--terms]`, the text on stdin. `--terms` adds the matched terms, for a local author who has to reword; `--hold` files a held post as a desk item.
+- **CLI**: `public-text-guard check --repo OWNER/REPO [--unattended] [--title T] [--hold TARGET] [--terms]`, the text on stdin. `--terms` adds the matched terms, for a local author who has to reword; `--hold` files a held post as a desk item. `--deadline UNIX_TIME` is when the caller gives up (a hook that kills the command at a timeout passes it): the check counts its budget from its own start and answers a second before the earlier of the two, so a loaded machine gets a verdict instead of a killed process. A check that ran out of time, or took over 3 s, logs what each lookup cost (`slow_check`, program names and seconds only).
 - **correspond**: at the top of `~/.config/correspond/config.toml`, `before_send = "pubcheck.correspond:before_send"`. Every write to a public audience is checked unattended; a held one raises correspond’s `NeedsApproval` with the categories, and on a real send (not a dry run) becomes a desk item.
 
 ## Held posts become desk items
@@ -100,9 +100,12 @@ True
 
 ### Module Attributes
 
-| [`DFLT_SETTINGS`](_autosummary/pubcheck.base.html.md#pubcheck.base.DFLT_SETTINGS)   | The settings and their defaults.   |
-|------------------------------------------------------------------|------------------------------------|
-| [`SETTINGS_ENV`](_autosummary/pubcheck.base.html.md#pubcheck.base.SETTINGS_ENV)    | config only).                      |
+| [`FINISH_RESERVE`](_autosummary/pubcheck.base.html.md#pubcheck.base.FINISH_RESERVE)   | Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a caller that kills it at its deadline gets an answer instead.   |
+|-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SLOW_CHECK`](_autosummary/pubcheck.base.html.md#pubcheck.base.SLOW_CHECK)       | A check slower than this (seconds) logs what its lookups cost, to find the slow one.                                                                 |
+| [`REAP_SECONDS`](_autosummary/pubcheck.base.html.md#pubcheck.base.REAP_SECONDS)     | Seconds to reap a killed lookup (its pipes may be held by a process outside its group).                                                              |
+| [`DFLT_SETTINGS`](_autosummary/pubcheck.base.html.md#pubcheck.base.DFLT_SETTINGS)    | The settings and their defaults.                                                                                                                     |
+| [`SETTINGS_ENV`](_autosummary/pubcheck.base.html.md#pubcheck.base.SETTINGS_ENV)     | config only).                                                                                                                                        |
 
 ### Functions
 
@@ -115,14 +118,18 @@ True
 
 ### Classes
 
-| [`Budget`](_autosummary/pubcheck.base.html.md#pubcheck.base.Budget)([seconds])   | One deadline shared by every lookup of a check.   |
-|----------------------------------------------------------------------|---------------------------------------------------|
+| [`Budget`](_autosummary/pubcheck.base.html.md#pubcheck.base.Budget)([seconds])   | One deadline shared by every lookup of a check, and a record of what each lookup cost.   |
+|----------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 
 ### *class* pubcheck.base.Budget(seconds=12.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-One deadline shared by every lookup of a check.
+One deadline shared by every lookup of a check, and a record of what each lookup cost.
+
+`lookups` holds `(label, seconds, outcome)` per lookup, `outcome` one of `ok`,
+`failed`, `timeout` or `skipped` (no time left); the label is the program’s
+name only, never an argument (one could carry a path or the text).
 
 #### left(cap=8.0)
 
@@ -131,9 +138,26 @@ Seconds a lookup may take: `cap`, or what is left of the budget when less.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
+#### report()
+
+The lookups as JSON-ready rows `[label, seconds, outcome]`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)]
+
 #### run(argv, , cap=8.0, stdin=None, env=None, cwd=None)
 
 `subprocess.run` within the budget; `None` when out of time or on failure.
+
+The lookup runs in its own process group, and running out of time kills the whole
+group: a program that started helpers of its own leaves none behind, still holding
+the machine, once the check has given up on it. The trade-off: a caller that kills the check
+itself (rather than giving it a `--deadline`) does not reach a lookup in flight,
+which runs on until its own end.
+
+#### *property* strained *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether a lookup ran out of time or was skipped for lack of it.
 
 ### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'credential_scanner': None, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
 
@@ -152,12 +176,25 @@ folders is unset by default and lives in their config file, never in this code:
   credential patterns, e.g. `betterleaks` (unset: none is run). See
   [`pubcheck.detectors.scanner_credential()`](_autosummary/pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential).
 
+### pubcheck.base.FINISH_RESERVE *= 1.0*
+
+Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a
+caller that kills it at its deadline gets an answer instead.
+
+### pubcheck.base.REAP_SECONDS *= 0.2*
+
+Seconds to reap a killed lookup (its pipes may be held by a process outside its group).
+
 ### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'credential_scanner': 'PUBCHECK_CREDENTIAL_SCANNER', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
 
 config only).
 
 * **Type:**
   The environment variable that overrides each setting (`private_patterns`
+
+### pubcheck.base.SLOW_CHECK *= 3.0*
+
+A check slower than this (seconds) logs what its lookups cost, to find the slow one.
 
 ### pubcheck.base.cache_dir()
 
@@ -842,18 +879,16 @@ Record a verdict in the shared cache’s format.
 
 # About this build
 
-This documentation was built on **2026-11-22 18:44 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a</code></a> on branch <code>main</code>, for **pubcheck 0.0.2** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 07:02 UTC** from commit <a href="https://github.com/thorwhalen/pubcheck/commit/3704c173ffd7620f916690ba0c890c9c15df3a8c"><code>3704c17</code></a> on branch <code>main</code>, for **pubcheck 0.0.3** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.2) is behind the latest release on PyPI (0.0.3): `pip install pubcheck` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                            |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f"><code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/pubcheck/commit/3704c173ffd7620f916690ba0c890c9c15df3a8c"><code>3704c173ffd7620f916690ba0c890c9c15df3a8c</code></a> |
 | Branch              | <code>main</code>                                                                                                                                          |
 | Tags at this commit | none                                                                                                                                                       |
 | Working tree        | clean                                                                                                                                                      |
@@ -864,15 +899,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/pubcheck</code>                                                           |
-| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/45056652673">45056652673</a>  |
+| Run          | <a href="https://github.com/thorwhalen/pubcheck/actions/runs/45128133508">45128133508</a>  |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>9bf0a6a8b3950788dae6ea1634eec0dee7ef953f</code> (in the history of the built commit) |
+| Event commit | <code>3704c173ffd7620f916690ba0c890c9c15df3a8c</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.23  |
+| epythet  | 0.2.24  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.16 |
@@ -891,14 +926,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/pubcheck/0.0.3/">0.0.3</a>, newer than the documented version (0.0.2).
+Latest release: <a href="https://pypi.org/project/pubcheck/0.0.3/">0.0.3</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/pubcheck && cd pubcheck
-git checkout 9bf0a6a8b3950788dae6ea1634eec0dee7ef953f
-pip install "epythet==0.2.23"
+git checkout 3704c173ffd7620f916690ba0c890c9c15df3a8c
+pip install "epythet==0.2.24"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

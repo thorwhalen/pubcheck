@@ -25,9 +25,12 @@ True
 
 ### Module Attributes
 
-| [`DFLT_SETTINGS`](#pubcheck.base.DFLT_SETTINGS)   | The settings and their defaults.   |
-|------------------------------------------------------------------|------------------------------------|
-| [`SETTINGS_ENV`](#pubcheck.base.SETTINGS_ENV)    | config only).                      |
+| [`FINISH_RESERVE`](#pubcheck.base.FINISH_RESERVE)   | Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a caller that kills it at its deadline gets an answer instead.   |
+|-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SLOW_CHECK`](#pubcheck.base.SLOW_CHECK)       | A check slower than this (seconds) logs what its lookups cost, to find the slow one.                                                                 |
+| [`REAP_SECONDS`](#pubcheck.base.REAP_SECONDS)     | Seconds to reap a killed lookup (its pipes may be held by a process outside its group).                                                              |
+| [`DFLT_SETTINGS`](#pubcheck.base.DFLT_SETTINGS)    | The settings and their defaults.                                                                                                                     |
+| [`SETTINGS_ENV`](#pubcheck.base.SETTINGS_ENV)     | config only).                                                                                                                                        |
 
 ### Functions
 
@@ -40,14 +43,18 @@ True
 
 ### Classes
 
-| [`Budget`](#pubcheck.base.Budget)([seconds])   | One deadline shared by every lookup of a check.   |
-|----------------------------------------------------------------------|---------------------------------------------------|
+| [`Budget`](#pubcheck.base.Budget)([seconds])   | One deadline shared by every lookup of a check, and a record of what each lookup cost.   |
+|----------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 
 ### *class* pubcheck.base.Budget(seconds=12.0)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
-One deadline shared by every lookup of a check.
+One deadline shared by every lookup of a check, and a record of what each lookup cost.
+
+`lookups` holds `(label, seconds, outcome)` per lookup, `outcome` one of `ok`,
+`failed`, `timeout` or `skipped` (no time left); the label is the program’s
+name only, never an argument (one could carry a path or the text).
 
 #### left(cap=8.0)
 
@@ -56,9 +63,26 @@ Seconds a lookup may take: `cap`, or what is left of the budget when less.
 * **Return type:**
   [`float`](https://docs.python.org/3/builtins/functions.html#float)
 
+#### report()
+
+The lookups as JSON-ready rows `[label, seconds, outcome]`.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`list`](https://docs.python.org/3/builtins/stdtypes.html#list)]
+
 #### run(argv, , cap=8.0, stdin=None, env=None, cwd=None)
 
 `subprocess.run` within the budget; `None` when out of time or on failure.
+
+The lookup runs in its own process group, and running out of time kills the whole
+group: a program that started helpers of its own leaves none behind, still holding
+the machine, once the check has given up on it. The trade-off: a caller that kills the check
+itself (rather than giving it a `--deadline`) does not reach a lookup in flight,
+which runs on until its own end.
+
+#### *property* strained *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
+
+Whether a lookup ran out of time or was skipped for lack of it.
 
 ### pubcheck.base.DFLT_SETTINGS *= {'budget_seconds': 12.0, 'credential_scanner': None, 'hold_label': 'escalate', 'hold_repo': None, 'private_issues': None, 'private_owner': None, 'private_patterns': ()}*
 
@@ -77,12 +101,25 @@ folders is unset by default and lives in their config file, never in this code:
   credential patterns, e.g. `betterleaks` (unset: none is run). See
   [`pubcheck.detectors.scanner_credential()`](pubcheck.detectors.html.md#pubcheck.detectors.scanner_credential).
 
+### pubcheck.base.FINISH_RESERVE *= 1.0*
+
+Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a
+caller that kills it at its deadline gets an answer instead.
+
+### pubcheck.base.REAP_SECONDS *= 0.2*
+
+Seconds to reap a killed lookup (its pipes may be held by a process outside its group).
+
 ### pubcheck.base.SETTINGS_ENV *= {'budget_seconds': 'PUBCHECK_BUDGET_SECONDS', 'credential_scanner': 'PUBCHECK_CREDENTIAL_SCANNER', 'hold_label': 'PUBCHECK_HOLD_LABEL', 'hold_repo': 'PUBCHECK_HOLD_REPO', 'private_issues': 'PUBCHECK_PRIVATE_ISSUES', 'private_owner': 'PUBCHECK_PRIVATE_OWNER'}*
 
 config only).
 
 * **Type:**
   The environment variable that overrides each setting (`private_patterns`
+
+### pubcheck.base.SLOW_CHECK *= 3.0*
+
+A check slower than this (seconds) logs what its lookups cost, to find the slow one.
 
 ### pubcheck.base.cache_dir()
 

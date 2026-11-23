@@ -157,179 +157,181 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="37">
 </span><span data-line="38">
 </span><span data-line="39"><span class="c1">#: What a desk item shows instead of a text whose credential only the scanner found.</span>
-</span><span data-line="40"><span class="n">WITHHELD</span> <span class="o">=</span> <span class="s2">"[withheld: a secret scanner found a credential here; read the post at its source]"</span>
-</span><span data-line="41">
-</span><span data-line="42">
+</span><span data-line="40"><span class="n">WITHHELD</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="41">    <span class="s2">"[withheld: a secret scanner found a credential here; read the post at its source]"</span>
+</span><span data-line="42"><span class="p">)</span>
+</span><span data-line="43">
+</span><span data-line="44">
 <div class="viewcode-block" id="redact">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.hold.html#pubcheck.redact">[docs]</a>
-</span><span data-line="43"><span class="k">def</span><span class="w"> </span><span class="nf">redact</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="44"><span class="w">    </span><span class="sa">r</span><span class="sd">"""``text`` with every credential-shaped string replaced by its pattern's name.</span>
-</span><span data-line="45">
-</span><span data-line="46"><span class="sd">    &gt;&gt;&gt; redact("a -----BEGIN RSA PRIVATE KEY-----\nMIIE\nxyz\n-----END RSA PRIVATE KEY----- b")</span>
-</span><span data-line="47"><span class="sd">    'a [credential redacted: private_key_block] b'</span>
-</span><span data-line="48"><span class="sd">    """</span>
-</span><span data-line="49">    <span class="kn">from</span><span class="w"> </span><span class="nn">openloops.egress</span><span class="w"> </span><span class="kn">import</span> <span class="n">CREDENTIAL_PATTERNS</span>
-</span><span data-line="50">
-</span><span data-line="51">    <span class="n">text</span> <span class="o">=</span> <span class="n">PEM_BLOCK</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">"[credential redacted: private_key_block]"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-</span><span data-line="52">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">CREDENTIAL_PATTERNS</span><span class="p">:</span>
-</span><span data-line="53">        <span class="n">text</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[credential redacted: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-</span><span data-line="54">    <span class="k">return</span> <span class="n">text</span></div>
+</span><span data-line="45"><span class="k">def</span><span class="w"> </span><span class="nf">redact</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="46"><span class="w">    </span><span class="sa">r</span><span class="sd">"""``text`` with every credential-shaped string replaced by its pattern's name.</span>
+</span><span data-line="47">
+</span><span data-line="48"><span class="sd">    &gt;&gt;&gt; redact("a -----BEGIN RSA PRIVATE KEY-----\nMIIE\nxyz\n-----END RSA PRIVATE KEY----- b")</span>
+</span><span data-line="49"><span class="sd">    'a [credential redacted: private_key_block] b'</span>
+</span><span data-line="50"><span class="sd">    """</span>
+</span><span data-line="51">    <span class="kn">from</span><span class="w"> </span><span class="nn">openloops.egress</span><span class="w"> </span><span class="kn">import</span> <span class="n">CREDENTIAL_PATTERNS</span>
+</span><span data-line="52">
+</span><span data-line="53">    <span class="n">text</span> <span class="o">=</span> <span class="n">PEM_BLOCK</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">"[credential redacted: private_key_block]"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+</span><span data-line="54">    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">CREDENTIAL_PATTERNS</span><span class="p">:</span>
+</span><span data-line="55">        <span class="n">text</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[credential redacted: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+</span><span data-line="56">    <span class="k">return</span> <span class="n">text</span></div>
 
-</span><span data-line="55">
-</span><span data-line="56">
+</span><span data-line="57">
+</span><span data-line="58">
 <div class="viewcode-block" id="hold_title">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.hold.html#pubcheck.hold_title">[docs]</a>
-</span><span data-line="57"><span class="k">def</span><span class="w"> </span><span class="nf">hold_title</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="58"><span class="w">    </span><span class="sd">"""``held: &lt;target&gt;: &lt;title&gt;``, short enough for a desk card.</span>
-</span><span data-line="59">
-</span><span data-line="60"><span class="sd">    &gt;&gt;&gt; hold_title("github:o/r", "Fix the thing")</span>
-</span><span data-line="61"><span class="sd">    'held: github:o/r: Fix the thing'</span>
-</span><span data-line="62"><span class="sd">    """</span>
-</span><span data-line="63">    <span class="n">head</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"held: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span>
-</span><span data-line="64">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">head</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">redact</span><span class="p">(</span><span class="n">title</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">head</span></div>
+</span><span data-line="59"><span class="k">def</span><span class="w"> </span><span class="nf">hold_title</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="60"><span class="w">    </span><span class="sd">"""``held: &lt;target&gt;: &lt;title&gt;``, short enough for a desk card.</span>
+</span><span data-line="61">
+</span><span data-line="62"><span class="sd">    &gt;&gt;&gt; hold_title("github:o/r", "Fix the thing")</span>
+</span><span data-line="63"><span class="sd">    'held: github:o/r: Fix the thing'</span>
+</span><span data-line="64"><span class="sd">    """</span>
+</span><span data-line="65">    <span class="n">head</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"held: </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span>
+</span><span data-line="66">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">head</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">redact</span><span class="p">(</span><span class="n">title</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">head</span></div>
 
-</span><span data-line="65">
-</span><span data-line="66">
+</span><span data-line="67">
+</span><span data-line="68">
 <div class="viewcode-block" id="hold_key">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.hold.html#pubcheck.hold_key">[docs]</a>
-</span><span data-line="67"><span class="k">def</span><span class="w"> </span><span class="nf">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="68"><span class="w">    </span><span class="sd">"""What makes two holds the same desk item: the same text to the same target."""</span>
-</span><span data-line="69">    <span class="k">return</span> <span class="n">text_hash</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">text_hash</span><span class="p">)</span></div>
+</span><span data-line="69"><span class="k">def</span><span class="w"> </span><span class="nf">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="70"><span class="w">    </span><span class="sd">"""What makes two holds the same desk item: the same text to the same target."""</span>
+</span><span data-line="71">    <span class="k">return</span> <span class="n">text_hash</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">verdict</span><span class="o">.</span><span class="n">text_hash</span><span class="p">)</span></div>
 
-</span><span data-line="70">
-</span><span data-line="71">
+</span><span data-line="72">
+</span><span data-line="73">
 <div class="viewcode-block" id="hold_body">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.hold.html#pubcheck.hold_body">[docs]</a>
-</span><span data-line="72"><span class="k">def</span><span class="w"> </span><span class="nf">hold_body</span><span class="p">(</span>
-</span><span data-line="73">    <span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span>
-</span><span data-line="74">    <span class="o">*</span><span class="p">,</span>
-</span><span data-line="75">    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="76">    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="77">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="78">    <span class="n">more</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span data-line="79"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="80"><span class="w">    </span><span class="sd">"""The desk item's body: why it was held, what would have been published, and the key."""</span>
-</span><span data-line="81">    <span class="n">why</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="82">        <span class="p">[</span><span class="sa">f</span><span class="s2">"- </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">HINTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">verdict</span><span class="o">.</span><span class="n">categories</span><span class="p">]</span>
-</span><span data-line="83">        <span class="k">if</span> <span class="n">verdict</span><span class="o">.</span><span class="n">decision</span> <span class="o">==</span> <span class="s2">"flag"</span>
-</span><span data-line="84">        <span class="k">else</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"- the check was unavailable: </span><span class="si">{</span><span class="n">verdict</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
-</span><span data-line="85">    <span class="p">)</span>
-</span><span data-line="86">    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">is_scanner_finding</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">verdict</span><span class="o">.</span><span class="n">findings</span><span class="p">):</span>
-</span><span data-line="87">        <span class="c1"># a credential only the external scanner knows: redact() cannot find it, so the</span>
-</span><span data-line="88">        <span class="c1"># text is not copied at all</span>
-</span><span data-line="89">        <span class="n">text</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">more</span> <span class="o">=</span> <span class="n">WITHHELD</span><span class="p">,</span> <span class="p">(</span><span class="n">WITHHELD</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">title</span><span class="p">),</span> <span class="p">()</span>
-</span><span data-line="90">    <span class="n">text</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">redact</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">redact</span><span class="p">(</span><span class="n">title</span><span class="p">)</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">title</span>
-</span><span data-line="91">    <span class="n">also</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="92">        <span class="p">[</span><span class="sa">f</span><span class="s2">"**Also published with it:** </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">redact</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">more</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">]</span>
-</span><span data-line="93">        <span class="k">if</span> <span class="n">more</span>
-</span><span data-line="94">        <span class="k">else</span> <span class="p">[]</span>
-</span><span data-line="95">    <span class="p">)</span>
-</span><span data-line="96">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-</span><span data-line="97">        <span class="p">[</span>
-</span><span data-line="98">            <span class="sa">f</span><span class="s2">"A post to `</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">` (</span><span class="si">{</span><span class="n">verdict</span><span class="o">.</span><span class="n">visibility</span><span class="si">}</span><span class="s2">) was held by the publication check, "</span>
-</span><span data-line="99">            <span class="s2">"and nothing was published."</span><span class="p">,</span>
-</span><span data-line="100">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="101">            <span class="s2">"**Why:**"</span><span class="p">,</span>
-</span><span data-line="102">            <span class="o">*</span><span class="n">why</span><span class="p">,</span>
-</span><span data-line="103">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="104">            <span class="s2">"**Accept** (publish as is, after reading it), **edit** (reword, then send again) "</span>
-</span><span data-line="105">            <span class="s2">"or **ignore** (close this issue)."</span><span class="p">,</span>
-</span><span data-line="106">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="107">            <span class="sa">f</span><span class="s2">"**Title:** </span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'(none)'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="74"><span class="k">def</span><span class="w"> </span><span class="nf">hold_body</span><span class="p">(</span>
+</span><span data-line="75">    <span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span>
+</span><span data-line="76">    <span class="o">*</span><span class="p">,</span>
+</span><span data-line="77">    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="78">    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="79">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="80">    <span class="n">more</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+</span><span data-line="81"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="82"><span class="w">    </span><span class="sd">"""The desk item's body: why it was held, what would have been published, and the key."""</span>
+</span><span data-line="83">    <span class="n">why</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="84">        <span class="p">[</span><span class="sa">f</span><span class="s2">"- </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">HINTS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">verdict</span><span class="o">.</span><span class="n">categories</span><span class="p">]</span>
+</span><span data-line="85">        <span class="k">if</span> <span class="n">verdict</span><span class="o">.</span><span class="n">decision</span> <span class="o">==</span> <span class="s2">"flag"</span>
+</span><span data-line="86">        <span class="k">else</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"- the check was unavailable: </span><span class="si">{</span><span class="n">verdict</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span>
+</span><span data-line="87">    <span class="p">)</span>
+</span><span data-line="88">    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">is_scanner_finding</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">verdict</span><span class="o">.</span><span class="n">findings</span><span class="p">):</span>
+</span><span data-line="89">        <span class="c1"># a credential only the external scanner knows: redact() cannot find it, so the</span>
+</span><span data-line="90">        <span class="c1"># text is not copied at all</span>
+</span><span data-line="91">        <span class="n">text</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">more</span> <span class="o">=</span> <span class="n">WITHHELD</span><span class="p">,</span> <span class="p">(</span><span class="n">WITHHELD</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">title</span><span class="p">),</span> <span class="p">()</span>
+</span><span data-line="92">    <span class="n">text</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">redact</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">redact</span><span class="p">(</span><span class="n">title</span><span class="p">)</span> <span class="k">if</span> <span class="n">title</span> <span class="k">else</span> <span class="n">title</span>
+</span><span data-line="93">    <span class="n">also</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="94">        <span class="p">[</span><span class="sa">f</span><span class="s2">"**Also published with it:** </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">redact</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">more</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">""</span><span class="p">]</span>
+</span><span data-line="95">        <span class="k">if</span> <span class="n">more</span>
+</span><span data-line="96">        <span class="k">else</span> <span class="p">[]</span>
+</span><span data-line="97">    <span class="p">)</span>
+</span><span data-line="98">    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span data-line="99">        <span class="p">[</span>
+</span><span data-line="100">            <span class="sa">f</span><span class="s2">"A post to `</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">` (</span><span class="si">{</span><span class="n">verdict</span><span class="o">.</span><span class="n">visibility</span><span class="si">}</span><span class="s2">) was held by the publication check, "</span>
+</span><span data-line="101">            <span class="s2">"and nothing was published."</span><span class="p">,</span>
+</span><span data-line="102">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="103">            <span class="s2">"**Why:**"</span><span class="p">,</span>
+</span><span data-line="104">            <span class="o">*</span><span class="n">why</span><span class="p">,</span>
+</span><span data-line="105">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="106">            <span class="s2">"**Accept** (publish as is, after reading it), **edit** (reword, then send again) "</span>
+</span><span data-line="107">            <span class="s2">"or **ignore** (close this issue)."</span><span class="p">,</span>
 </span><span data-line="108">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="109">            <span class="o">*</span><span class="n">also</span><span class="p">,</span>
-</span><span data-line="110">            <span class="s2">"**Text:**"</span><span class="p">,</span>
-</span><span data-line="111">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="112">            <span class="s2">"````"</span><span class="p">,</span>
-</span><span data-line="113">            <span class="n">text</span><span class="p">,</span>
+</span><span data-line="109">            <span class="sa">f</span><span class="s2">"**Title:** </span><span class="si">{</span><span class="n">title</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'(none)'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span data-line="110">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="111">            <span class="o">*</span><span class="n">also</span><span class="p">,</span>
+</span><span data-line="112">            <span class="s2">"**Text:**"</span><span class="p">,</span>
+</span><span data-line="113">            <span class="s2">""</span><span class="p">,</span>
 </span><span data-line="114">            <span class="s2">"````"</span><span class="p">,</span>
-</span><span data-line="115">            <span class="s2">""</span><span class="p">,</span>
-</span><span data-line="116">            <span class="sa">f</span><span class="s2">"&lt;!-- </span><span class="si">{</span><span class="n">MARKER</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> --&gt;"</span><span class="p">,</span>
-</span><span data-line="117">        <span class="p">]</span>
-</span><span data-line="118">    <span class="p">)</span></div>
+</span><span data-line="115">            <span class="n">text</span><span class="p">,</span>
+</span><span data-line="116">            <span class="s2">"````"</span><span class="p">,</span>
+</span><span data-line="117">            <span class="s2">""</span><span class="p">,</span>
+</span><span data-line="118">            <span class="sa">f</span><span class="s2">"&lt;!-- </span><span class="si">{</span><span class="n">MARKER</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span><span class="w"> </span><span class="n">target</span><span class="p">)</span><span class="si">}</span><span class="s2"> --&gt;"</span><span class="p">,</span>
+</span><span data-line="119">        <span class="p">]</span>
+</span><span data-line="120">    <span class="p">)</span></div>
 
-</span><span data-line="119">
-</span><span data-line="120">
-</span><span data-line="121"><span class="k">def</span><span class="w"> </span><span class="nf">_existing</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">budget</span><span class="p">:</span> <span class="n">Budget</span><span class="p">):</span>
-</span><span data-line="122">    <span class="n">r</span> <span class="o">=</span> <span class="n">budget</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span data-line="123">        <span class="p">[</span>
-</span><span data-line="124">            <span class="s2">"gh"</span><span class="p">,</span>
-</span><span data-line="125">            <span class="s2">"issue"</span><span class="p">,</span>
-</span><span data-line="126">            <span class="s2">"list"</span><span class="p">,</span>
-</span><span data-line="127">            <span class="s2">"-R"</span><span class="p">,</span>
-</span><span data-line="128">            <span class="n">repo</span><span class="p">,</span>
-</span><span data-line="129">            <span class="s2">"--state"</span><span class="p">,</span>
-</span><span data-line="130">            <span class="s2">"open"</span><span class="p">,</span>
-</span><span data-line="131">            <span class="s2">"--search"</span><span class="p">,</span>
-</span><span data-line="132">            <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">MARKER</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">" in:body'</span><span class="p">,</span>
-</span><span data-line="133">            <span class="s2">"--json"</span><span class="p">,</span>
-</span><span data-line="134">            <span class="s2">"url"</span><span class="p">,</span>
-</span><span data-line="135">            <span class="s2">"-q"</span><span class="p">,</span>
-</span><span data-line="136">            <span class="s2">".[0].url"</span><span class="p">,</span>
-</span><span data-line="137">        <span class="p">],</span>
-</span><span data-line="138">        <span class="n">cap</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-</span><span data-line="139">    <span class="p">)</span>
-</span><span data-line="140">    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
-</span><span data-line="141">    <span class="k">return</span> <span class="n">url</span>
-</span><span data-line="142">
-</span><span data-line="143">
+</span><span data-line="121">
+</span><span data-line="122">
+</span><span data-line="123"><span class="k">def</span><span class="w"> </span><span class="nf">_existing</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">budget</span><span class="p">:</span> <span class="n">Budget</span><span class="p">):</span>
+</span><span data-line="124">    <span class="n">r</span> <span class="o">=</span> <span class="n">budget</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span data-line="125">        <span class="p">[</span>
+</span><span data-line="126">            <span class="s2">"gh"</span><span class="p">,</span>
+</span><span data-line="127">            <span class="s2">"issue"</span><span class="p">,</span>
+</span><span data-line="128">            <span class="s2">"list"</span><span class="p">,</span>
+</span><span data-line="129">            <span class="s2">"-R"</span><span class="p">,</span>
+</span><span data-line="130">            <span class="n">repo</span><span class="p">,</span>
+</span><span data-line="131">            <span class="s2">"--state"</span><span class="p">,</span>
+</span><span data-line="132">            <span class="s2">"open"</span><span class="p">,</span>
+</span><span data-line="133">            <span class="s2">"--search"</span><span class="p">,</span>
+</span><span data-line="134">            <span class="sa">f</span><span class="s1">'"</span><span class="si">{</span><span class="n">MARKER</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">" in:body'</span><span class="p">,</span>
+</span><span data-line="135">            <span class="s2">"--json"</span><span class="p">,</span>
+</span><span data-line="136">            <span class="s2">"url"</span><span class="p">,</span>
+</span><span data-line="137">            <span class="s2">"-q"</span><span class="p">,</span>
+</span><span data-line="138">            <span class="s2">".[0].url"</span><span class="p">,</span>
+</span><span data-line="139">        <span class="p">],</span>
+</span><span data-line="140">        <span class="n">cap</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+</span><span data-line="141">    <span class="p">)</span>
+</span><span data-line="142">    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">r</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">""</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+</span><span data-line="143">    <span class="k">return</span> <span class="n">url</span>
+</span><span data-line="144">
+</span><span data-line="145">
 <div class="viewcode-block" id="file_hold">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.hold.html#pubcheck.file_hold">[docs]</a>
-</span><span data-line="144"><span class="k">def</span><span class="w"> </span><span class="nf">file_hold</span><span class="p">(</span>
-</span><span data-line="145">    <span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span>
-</span><span data-line="146">    <span class="o">*</span><span class="p">,</span>
-</span><span data-line="147">    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="148">    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="149">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="150">    <span class="n">more</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span data-line="151">    <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="152">    <span class="n">budget</span><span class="p">:</span> <span class="n">Budget</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span data-line="153"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span data-line="154"><span class="w">    </span><span class="sd">"""File (or find) the desk item for a held post; ``{"filed": bool, "url"?, "reason"?}``. Never raises."""</span>
-</span><span data-line="155">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span data-line="156">    <span class="n">repo</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">"hold_repo"</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s2">"hold_label"</span><span class="p">]</span>
-</span><span data-line="157">    <span class="n">budget</span> <span class="o">=</span> <span class="n">budget</span> <span class="ow">or</span> <span class="n">Budget</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">])</span>
-</span><span data-line="158">    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="p">:</span>
-</span><span data-line="159">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="s2">"no hold_repo is configured"</span><span class="p">}</span>
-</span><span data-line="160">    <span class="k">if</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">"gh"</span><span class="p">):</span>
-</span><span data-line="161">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="s2">"gh is not installed"</span><span class="p">}</span>
-</span><span data-line="162">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="163">        <span class="n">private</span> <span class="o">=</span> <span class="n">gh_repo_view</span><span class="p">(</span>
-</span><span data-line="164">            <span class="n">repo</span><span class="p">,</span> <span class="n">budget</span><span class="o">=</span><span class="n">budget</span>
-</span><span data-line="165">        <span class="p">)</span>  <span class="c1"># fresh: never trust a cache before copying</span>
-</span><span data-line="166">        <span class="k">if</span> <span class="n">private</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
-</span><span data-line="167">            <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="168">                <span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-</span><span data-line="169">                <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"the hold repo </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> is not known to be private, so the text is not copied there"</span><span class="p">,</span>
-</span><span data-line="170">            <span class="p">}</span>
-</span><span data-line="171">        <span class="n">url</span> <span class="o">=</span> <span class="n">_existing</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">budget</span><span class="p">)</span>
-</span><span data-line="172">        <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
-</span><span data-line="173">            <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span> <span class="s2">"repo"</span><span class="p">:</span> <span class="n">repo</span><span class="p">,</span> <span class="s2">"existing"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-</span><span data-line="174">        <span class="n">body</span> <span class="o">=</span> <span class="n">hold_body</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">more</span><span class="o">=</span><span class="n">more</span><span class="p">)</span>
-</span><span data-line="175">        <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span>
-</span><span data-line="176">            <span class="s2">"gh"</span><span class="p">,</span>
-</span><span data-line="177">            <span class="s2">"issue"</span><span class="p">,</span>
-</span><span data-line="178">            <span class="s2">"create"</span><span class="p">,</span>
-</span><span data-line="179">            <span class="s2">"-R"</span><span class="p">,</span>
-</span><span data-line="180">            <span class="n">repo</span><span class="p">,</span>
-</span><span data-line="181">            <span class="s2">"--title"</span><span class="p">,</span>
-</span><span data-line="182">            <span class="n">hold_title</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
-</span><span data-line="183">            <span class="s2">"--body-file"</span><span class="p">,</span>
-</span><span data-line="184">            <span class="s2">"-"</span><span class="p">,</span>
-</span><span data-line="185">        <span class="p">]</span>
-</span><span data-line="186">        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
-</span><span data-line="187">            <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"--label"</span><span class="p">,</span> <span class="n">label</span><span class="p">]</span>
-</span><span data-line="188">        <span class="n">r</span> <span class="o">=</span> <span class="n">budget</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">cap</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
-</span><span data-line="189">        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">r</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-</span><span data-line="190">            <span class="n">err</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="191">                <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">"?"</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span><span data-line="192">                <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span data-line="193">                <span class="k">else</span> <span class="s2">"out of time"</span>
-</span><span data-line="194">            <span class="p">)</span>
-</span><span data-line="195">            <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"gh issue create failed: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
-</span><span data-line="196">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"repo"</span><span class="p">:</span> <span class="n">repo</span><span class="p">}</span>
-</span><span data-line="197">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-</span><span data-line="198">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"filing failed (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)"</span><span class="p">}</span></div>
+</span><span data-line="146"><span class="k">def</span><span class="w"> </span><span class="nf">file_hold</span><span class="p">(</span>
+</span><span data-line="147">    <span class="n">verdict</span><span class="p">:</span> <span class="n">Verdict</span><span class="p">,</span>
+</span><span data-line="148">    <span class="o">*</span><span class="p">,</span>
+</span><span data-line="149">    <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="150">    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="151">    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="152">    <span class="n">more</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
+</span><span data-line="153">    <span class="n">config</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="154">    <span class="n">budget</span><span class="p">:</span> <span class="n">Budget</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span data-line="155"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span data-line="156"><span class="w">    </span><span class="sd">"""File (or find) the desk item for a held post; ``{"filed": bool, "url"?, "reason"?}``. Never raises."""</span>
+</span><span data-line="157">    <span class="n">s</span> <span class="o">=</span> <span class="n">settings</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span data-line="158">    <span class="n">repo</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s2">"hold_repo"</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="s2">"hold_label"</span><span class="p">]</span>
+</span><span data-line="159">    <span class="n">budget</span> <span class="o">=</span> <span class="n">budget</span> <span class="ow">or</span> <span class="n">Budget</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s2">"budget_seconds"</span><span class="p">])</span>
+</span><span data-line="160">    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="p">:</span>
+</span><span data-line="161">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="s2">"no hold_repo is configured"</span><span class="p">}</span>
+</span><span data-line="162">    <span class="k">if</span> <span class="ow">not</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">"gh"</span><span class="p">):</span>
+</span><span data-line="163">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="s2">"gh is not installed"</span><span class="p">}</span>
+</span><span data-line="164">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="165">        <span class="n">private</span> <span class="o">=</span> <span class="n">gh_repo_view</span><span class="p">(</span>
+</span><span data-line="166">            <span class="n">repo</span><span class="p">,</span> <span class="n">budget</span><span class="o">=</span><span class="n">budget</span>
+</span><span data-line="167">        <span class="p">)</span>  <span class="c1"># fresh: never trust a cache before copying</span>
+</span><span data-line="168">        <span class="k">if</span> <span class="n">private</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
+</span><span data-line="169">            <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="170">                <span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+</span><span data-line="171">                <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"the hold repo </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> is not known to be private, so the text is not copied there"</span><span class="p">,</span>
+</span><span data-line="172">            <span class="p">}</span>
+</span><span data-line="173">        <span class="n">url</span> <span class="o">=</span> <span class="n">_existing</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">hold_key</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span> <span class="n">budget</span><span class="p">)</span>
+</span><span data-line="174">        <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+</span><span data-line="175">            <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span> <span class="s2">"repo"</span><span class="p">:</span> <span class="n">repo</span><span class="p">,</span> <span class="s2">"existing"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</span><span data-line="176">        <span class="n">body</span> <span class="o">=</span> <span class="n">hold_body</span><span class="p">(</span><span class="n">verdict</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">more</span><span class="o">=</span><span class="n">more</span><span class="p">)</span>
+</span><span data-line="177">        <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span>
+</span><span data-line="178">            <span class="s2">"gh"</span><span class="p">,</span>
+</span><span data-line="179">            <span class="s2">"issue"</span><span class="p">,</span>
+</span><span data-line="180">            <span class="s2">"create"</span><span class="p">,</span>
+</span><span data-line="181">            <span class="s2">"-R"</span><span class="p">,</span>
+</span><span data-line="182">            <span class="n">repo</span><span class="p">,</span>
+</span><span data-line="183">            <span class="s2">"--title"</span><span class="p">,</span>
+</span><span data-line="184">            <span class="n">hold_title</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span>
+</span><span data-line="185">            <span class="s2">"--body-file"</span><span class="p">,</span>
+</span><span data-line="186">            <span class="s2">"-"</span><span class="p">,</span>
+</span><span data-line="187">        <span class="p">]</span>
+</span><span data-line="188">        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+</span><span data-line="189">            <span class="n">argv</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">"--label"</span><span class="p">,</span> <span class="n">label</span><span class="p">]</span>
+</span><span data-line="190">        <span class="n">r</span> <span class="o">=</span> <span class="n">budget</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">argv</span><span class="p">,</span> <span class="n">cap</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+</span><span data-line="191">        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">r</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="192">            <span class="n">err</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="193">                <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">"?"</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span data-line="194">                <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span data-line="195">                <span class="k">else</span> <span class="s2">"out of time"</span>
+</span><span data-line="196">            <span class="p">)</span>
+</span><span data-line="197">            <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"gh issue create failed: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
+</span><span data-line="198">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"repo"</span><span class="p">:</span> <span class="n">repo</span><span class="p">}</span>
+</span><span data-line="199">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span data-line="200">        <span class="k">return</span> <span class="p">{</span><span class="s2">"filed"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"reason"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"filing failed (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)"</span><span class="p">}</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -358,7 +360,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../_static/documentation_options.js?v=47de8214"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

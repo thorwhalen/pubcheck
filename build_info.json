@@ -1,36 +1,36 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T18:44:25Z",
+  "built_at": "2026-11-23T07:02:58Z",
   "package": {
     "name": "pubcheck",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "display_name": "pubcheck",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "9bf0a6a8b3950788dae6ea1634eec0dee7ef953f",
-    "short_commit": "9bf0a6a",
+    "commit": "3704c173ffd7620f916690ba0c890c9c15df3a8c",
+    "short_commit": "3704c17",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/pubcheck",
-    "commit_url": "https://github.com/thorwhalen/pubcheck/commit/9bf0a6a8b3950788dae6ea1634eec0dee7ef953f",
+    "commit_url": "https://github.com/thorwhalen/pubcheck/commit/3704c173ffd7620f916690ba0c890c9c15df3a8c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/pubcheck",
-    "sha": "9bf0a6a8b3950788dae6ea1634eec0dee7ef953f",
+    "sha": "3704c173ffd7620f916690ba0c890c9c15df3a8c",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "45056652673",
-    "run_url": "https://github.com/thorwhalen/pubcheck/actions/runs/45056652673",
+    "run_id": "45128133508",
+    "run_url": "https://github.com/thorwhalen/pubcheck/actions/runs/45128133508",
     "server_url": "https://github.com"
   },
   "tools": {
-    "epythet": "0.2.23",
+    "epythet": "0.2.24",
     "sphinx": "9.1.1",
     "docutils": "0.22.4",
     "python": "3.12.16"
@@ -56,20 +56,18 @@
   },
   "site": {
     "modules_documented": 7,
-    "objects_documented": 64
+    "objects_documented": 69
   },
   "pypi": {
     "checked": true,
     "latest": "0.0.3",
-    "relation": "behind",
+    "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/pubcheck && cd pubcheck\ngit checkout 9bf0a6a8b3950788dae6ea1634eec0dee7ef953f\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/pubcheck && cd pubcheck\ngit checkout 3704c173ffd7620f916690ba0c890c9c15df3a8c\npip install \"epythet==0.2.24\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": false,
-    "notes": [
-      "The documented version (0.0.2) is behind the latest release on PyPI (0.0.3): `pip install pubcheck` gives newer code than these docs describe."
-    ]
+    "aligned": true,
+    "notes": []
   }
 }

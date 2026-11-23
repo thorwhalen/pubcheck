@@ -430,82 +430,86 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="283">        <span class="p">[</span><span class="n">exe</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">],</span> <span class="n">cap</span><span class="o">=</span><span class="n">SCANNER_TIMEOUT</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
 </span><span data-line="284">    <span class="p">)</span>
 </span><span data-line="285">    <span class="k">if</span> <span class="n">done</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="286">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span><span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> failed or ran out of time"</span><span class="p">)</span>
-</span><span data-line="287">    <span class="k">if</span> <span class="n">done</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-</span><span data-line="288">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span><span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> exited </span><span class="si">{</span><span class="n">done</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span data-line="289">    <span class="k">try</span><span class="p">:</span>
-</span><span data-line="290">        <span class="n">report</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">done</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-</span><span data-line="291">    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-</span><span data-line="292">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span>
-</span><span data-line="293">            <span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> printed no JSON report"</span>
-</span><span data-line="294">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-</span><span data-line="295">    <span class="k">if</span> <span class="n">report</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Go encodes an empty slice as null</span>
-</span><span data-line="296">        <span class="k">return</span> <span class="p">[]</span>
-</span><span data-line="297">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-</span><span data-line="298">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span><span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> printed no list"</span><span class="p">)</span>
-</span><span data-line="299">    <span class="k">return</span> <span class="n">report</span>
-</span><span data-line="300">
-</span><span data-line="301">
+</span><span data-line="286">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span>
+</span><span data-line="287">            <span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> failed or ran out of time"</span>
+</span><span data-line="288">        <span class="p">)</span>
+</span><span data-line="289">    <span class="k">if</span> <span class="n">done</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="290">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span>
+</span><span data-line="291">            <span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> exited </span><span class="si">{</span><span class="n">done</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">"</span>
+</span><span data-line="292">        <span class="p">)</span>
+</span><span data-line="293">    <span class="k">try</span><span class="p">:</span>
+</span><span data-line="294">        <span class="n">report</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">done</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+</span><span data-line="295">    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+</span><span data-line="296">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span>
+</span><span data-line="297">            <span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> printed no JSON report"</span>
+</span><span data-line="298">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+</span><span data-line="299">    <span class="k">if</span> <span class="n">report</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Go encodes an empty slice as null</span>
+</span><span data-line="300">        <span class="k">return</span> <span class="p">[]</span>
+</span><span data-line="301">    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">report</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+</span><span data-line="302">        <span class="k">raise</span> <span class="n">ScannerUnavailable</span><span class="p">(</span><span class="sa">f</span><span class="s2">"credential_scanner </span><span class="si">{</span><span class="n">scanner</span><span class="si">!r}</span><span class="s2"> printed no list"</span><span class="p">)</span>
+</span><span data-line="303">    <span class="k">return</span> <span class="n">report</span>
+</span><span data-line="304">
+</span><span data-line="305">
 <div class="viewcode-block" id="is_scanner_finding">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.detectors.html#pubcheck.is_scanner_finding">[docs]</a>
-</span><span data-line="302"><span class="k">def</span><span class="w"> </span><span class="nf">is_scanner_finding</span><span class="p">(</span><span class="n">finding</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="303"><span class="w">    </span><span class="sd">"""True for a credential an external scanner found (its term is ``&lt;scanner&gt;:&lt;rule&gt;``).</span>
-</span><span data-line="304">
-</span><span data-line="305"><span class="sd">    The built-in patterns name their findings without a colon, and only they are known</span>
-</span><span data-line="306"><span class="sd">    to :func:`pubcheck.hold.redact`.</span>
-</span><span data-line="307">
-</span><span data-line="308"><span class="sd">    &gt;&gt;&gt; is_scanner_finding(("credential", "betterleaks:slack-webhook-url"))</span>
-</span><span data-line="309"><span class="sd">    True</span>
-</span><span data-line="310"><span class="sd">    &gt;&gt;&gt; is_scanner_finding(("credential", "github_token"))</span>
-</span><span data-line="311"><span class="sd">    False</span>
-</span><span data-line="312"><span class="sd">    """</span>
-</span><span data-line="313">    <span class="n">category</span><span class="p">,</span> <span class="n">term</span> <span class="o">=</span> <span class="n">finding</span>
-</span><span data-line="314">    <span class="k">return</span> <span class="n">category</span> <span class="o">==</span> <span class="s2">"credential"</span> <span class="ow">and</span> <span class="s2">":"</span> <span class="ow">in</span> <span class="n">term</span></div>
+</span><span data-line="306"><span class="k">def</span><span class="w"> </span><span class="nf">is_scanner_finding</span><span class="p">(</span><span class="n">finding</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="307"><span class="w">    </span><span class="sd">"""True for a credential an external scanner found (its term is ``&lt;scanner&gt;:&lt;rule&gt;``).</span>
+</span><span data-line="308">
+</span><span data-line="309"><span class="sd">    The built-in patterns name their findings without a colon, and only they are known</span>
+</span><span data-line="310"><span class="sd">    to :func:`pubcheck.hold.redact`.</span>
+</span><span data-line="311">
+</span><span data-line="312"><span class="sd">    &gt;&gt;&gt; is_scanner_finding(("credential", "betterleaks:slack-webhook-url"))</span>
+</span><span data-line="313"><span class="sd">    True</span>
+</span><span data-line="314"><span class="sd">    &gt;&gt;&gt; is_scanner_finding(("credential", "github_token"))</span>
+</span><span data-line="315"><span class="sd">    False</span>
+</span><span data-line="316"><span class="sd">    """</span>
+</span><span data-line="317">    <span class="n">category</span><span class="p">,</span> <span class="n">term</span> <span class="o">=</span> <span class="n">finding</span>
+</span><span data-line="318">    <span class="k">return</span> <span class="n">category</span> <span class="o">==</span> <span class="s2">"credential"</span> <span class="ow">and</span> <span class="s2">":"</span> <span class="ow">in</span> <span class="n">term</span></div>
 
-</span><span data-line="315">
-</span><span data-line="316">
-</span><span data-line="317"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</span><span data-line="318"><span class="k">def</span><span class="w"> </span><span class="nf">_say_once</span><span class="p">(</span><span class="n">why</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="319"><span class="w">    </span><span class="sd">"""Say once per process, on stderr, that an attended check ran without the scanner."""</span>
-</span><span data-line="320">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"pubcheck: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">; built-in credential patterns only"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
-</span><span data-line="321">
-</span><span data-line="322">
+</span><span data-line="319">
+</span><span data-line="320">
+</span><span data-line="321"><span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span data-line="322"><span class="k">def</span><span class="w"> </span><span class="nf">_say_once</span><span class="p">(</span><span class="n">why</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="323"><span class="w">    </span><span class="sd">"""Say once per process, on stderr, that an attended check ran without the scanner."""</span>
+</span><span data-line="324">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"pubcheck: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">; built-in credential patterns only"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+</span><span data-line="325">
+</span><span data-line="326">
 <div class="viewcode-block" id="mention">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.detectors.html#pubcheck.mention">[docs]</a>
-</span><span data-line="323"><span class="k">def</span><span class="w"> </span><span class="nf">mention</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
-</span><span data-line="324"><span class="w">    </span><span class="sd">"""``@login`` and ``@org/team`` outside code spans and blocks: each notifies someone."""</span>
-</span><span data-line="325">    <span class="n">bare</span> <span class="o">=</span> <span class="n">_CODE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-</span><span data-line="326">    <span class="k">return</span> <span class="p">[(</span><span class="s2">"mention"</span><span class="p">,</span> <span class="s2">"@"</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">MENTION</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">bare</span><span class="p">)]</span></div>
+</span><span data-line="327"><span class="k">def</span><span class="w"> </span><span class="nf">mention</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
+</span><span data-line="328"><span class="w">    </span><span class="sd">"""``@login`` and ``@org/team`` outside code spans and blocks: each notifies someone."""</span>
+</span><span data-line="329">    <span class="n">bare</span> <span class="o">=</span> <span class="n">_CODE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+</span><span data-line="330">    <span class="k">return</span> <span class="p">[(</span><span class="s2">"mention"</span><span class="p">,</span> <span class="s2">"@"</span> <span class="o">+</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">MENTION</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">bare</span><span class="p">)]</span></div>
 
-</span><span data-line="327">
-</span><span data-line="328">
-</span><span data-line="329"><span class="c1">#: The detectors for an attended writer (a Claude Code session): the seam is this tuple.</span>
-</span><span data-line="330"><span class="n">DETECTORS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Detector</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="331">    <span class="n">registry</span><span class="p">,</span>
-</span><span data-line="332">    <span class="n">owner_relation</span><span class="p">,</span>
-</span><span data-line="333">    <span class="n">private_ref</span><span class="p">,</span>
-</span><span data-line="334">    <span class="n">session_link</span><span class="p">,</span>
-</span><span data-line="335">    <span class="n">credential</span><span class="p">,</span>
-</span><span data-line="336">    <span class="n">scanner_credential</span><span class="p">,</span>
-</span><span data-line="337"><span class="p">)</span>
-</span><span data-line="338"><span class="c1">#: An unattended writer also holds every @mention: nobody chose to notify that person.</span>
-</span><span data-line="339"><span class="n">UNATTENDED_DETECTORS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Detector</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">DETECTORS</span> <span class="o">+</span> <span class="p">(</span><span class="n">mention</span><span class="p">,)</span>
-</span><span data-line="340">
-</span><span data-line="341">
+</span><span data-line="331">
+</span><span data-line="332">
+</span><span data-line="333"><span class="c1">#: The detectors for an attended writer (a Claude Code session): the seam is this tuple.</span>
+</span><span data-line="334"><span class="n">DETECTORS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Detector</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="335">    <span class="n">registry</span><span class="p">,</span>
+</span><span data-line="336">    <span class="n">owner_relation</span><span class="p">,</span>
+</span><span data-line="337">    <span class="n">private_ref</span><span class="p">,</span>
+</span><span data-line="338">    <span class="n">session_link</span><span class="p">,</span>
+</span><span data-line="339">    <span class="n">credential</span><span class="p">,</span>
+</span><span data-line="340">    <span class="n">scanner_credential</span><span class="p">,</span>
+</span><span data-line="341"><span class="p">)</span>
+</span><span data-line="342"><span class="c1">#: An unattended writer also holds every @mention: nobody chose to notify that person.</span>
+</span><span data-line="343"><span class="n">UNATTENDED_DETECTORS</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Detector</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">DETECTORS</span> <span class="o">+</span> <span class="p">(</span><span class="n">mention</span><span class="p">,)</span>
+</span><span data-line="344">
+</span><span data-line="345">
 <div class="viewcode-block" id="findings">
 <a class="viewcode-back" href="../../_autosummary/pubcheck.detectors.html#pubcheck.findings">[docs]</a>
-</span><span data-line="342"><span class="k">def</span><span class="w"> </span><span class="nf">findings</span><span class="p">(</span><span class="n">texts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">detectors</span><span class="o">=</span><span class="n">DETECTORS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Finding</span><span class="p">]:</span>
-</span><span data-line="343"><span class="w">    </span><span class="sd">"""``[(category, term)]``, each once, found by ``detectors`` in any of ``texts``."""</span>
-</span><span data-line="344">    <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Finding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="345">    <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">]</span>
-</span><span data-line="346">    <span class="k">for</span> <span class="n">detect</span> <span class="ow">in</span> <span class="n">detectors</span><span class="p">:</span>
-</span><span data-line="347">        <span class="c1"># a detector that starts a process sees the whole post once, not text by text</span>
-</span><span data-line="348">        <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">)]</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">detect</span><span class="p">,</span> <span class="s2">"whole_batch"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">texts</span>
-</span><span data-line="349">        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
-</span><span data-line="350">            <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
-</span><span data-line="351">                <span class="k">if</span> <span class="n">hit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-</span><span data-line="352">                    <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span>
-</span><span data-line="353">    <span class="k">return</span> <span class="n">seen</span></div>
+</span><span data-line="346"><span class="k">def</span><span class="w"> </span><span class="nf">findings</span><span class="p">(</span><span class="n">texts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">detectors</span><span class="o">=</span><span class="n">DETECTORS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Finding</span><span class="p">]:</span>
+</span><span data-line="347"><span class="w">    </span><span class="sd">"""``[(category, term)]``, each once, found by ``detectors`` in any of ``texts``."""</span>
+</span><span data-line="348">    <span class="n">seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Finding</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="349">    <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\s+"</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span> <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">]</span>
+</span><span data-line="350">    <span class="k">for</span> <span class="n">detect</span> <span class="ow">in</span> <span class="n">detectors</span><span class="p">:</span>
+</span><span data-line="351">        <span class="c1"># a detector that starts a process sees the whole post once, not text by text</span>
+</span><span data-line="352">        <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">)]</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">detect</span><span class="p">,</span> <span class="s2">"whole_batch"</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="k">else</span> <span class="n">texts</span>
+</span><span data-line="353">        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+</span><span data-line="354">            <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">detect</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
+</span><span data-line="355">                <span class="k">if</span> <span class="n">hit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+</span><span data-line="356">                    <span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hit</span><span class="p">)</span>
+</span><span data-line="357">    <span class="k">return</span> <span class="n">seen</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
@@ -534,7 +538,7 @@ data-aria-dark="Switch to auto color mode">
     </div>
   </div>
 </footer>
-      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../_static/documentation_options.js?v=47de8214"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>

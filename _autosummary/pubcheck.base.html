@@ -90,11 +90,16 @@ data-aria-dark="Switch to auto color mode">
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#pubcheck.base.Budget"><code class="docutils literal notranslate"><span class="pre">Budget</span></code></a><ul>
 <li><a class="reference internal" href="#pubcheck.base.Budget.left"><code class="docutils literal notranslate"><span class="pre">Budget.left()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.Budget.report"><code class="docutils literal notranslate"><span class="pre">Budget.report()</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.base.Budget.run"><code class="docutils literal notranslate"><span class="pre">Budget.run()</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.Budget.strained"><code class="docutils literal notranslate"><span class="pre">Budget.strained</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.FINISH_RESERVE"><code class="docutils literal notranslate"><span class="pre">FINISH_RESERVE</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.REAP_SECONDS"><code class="docutils literal notranslate"><span class="pre">REAP_SECONDS</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.base.SETTINGS_ENV"><code class="docutils literal notranslate"><span class="pre">SETTINGS_ENV</span></code></a></li>
+<li><a class="reference internal" href="#pubcheck.base.SLOW_CHECK"><code class="docutils literal notranslate"><span class="pre">SLOW_CHECK</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.base.cache_dir"><code class="docutils literal notranslate"><span class="pre">cache_dir()</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.base.log_event"><code class="docutils literal notranslate"><span class="pre">log_event()</span></code></a></li>
 <li><a class="reference internal" href="#pubcheck.base.settings"><code class="docutils literal notranslate"><span class="pre">settings()</span></code></a></li>
@@ -162,10 +167,19 @@ override’s reason as its author wrote it.</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.FINISH_RESERVE" title="pubcheck.base.FINISH_RESERVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FINISH_RESERVE</span></code></a></p></td>
+<td><p>Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a caller that kills it at its deadline gets an answer instead.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.SLOW_CHECK" title="pubcheck.base.SLOW_CHECK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SLOW_CHECK</span></code></a></p></td>
+<td><p>A check slower than this (seconds) logs what its lookups cost, to find the slow one.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.REAP_SECONDS" title="pubcheck.base.REAP_SECONDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REAP_SECONDS</span></code></a></p></td>
+<td><p>Seconds to reap a killed lookup (its pipes may be held by a process outside its group).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.DFLT_SETTINGS" title="pubcheck.base.DFLT_SETTINGS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_SETTINGS</span></code></a></p></td>
 <td><p>The settings and their defaults.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pubcheck.base.SETTINGS_ENV" title="pubcheck.base.SETTINGS_ENV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETTINGS_ENV</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.SETTINGS_ENV" title="pubcheck.base.SETTINGS_ENV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SETTINGS_ENV</span></code></a></p></td>
 <td><p>config only).</p></td>
 </tr>
 </tbody>
@@ -198,7 +212,7 @@ override’s reason as its author wrote it.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pubcheck.base.Budget" title="pubcheck.base.Budget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Budget</span></code></a>([seconds])</p></td>
-<td><p>One deadline shared by every lookup of a check.</p></td>
+<td><p>One deadline shared by every lookup of a check, and a record of what each lookup cost.</p></td>
 </tr>
 </tbody>
 </table>
@@ -207,7 +221,10 @@ override’s reason as its author wrote it.</p>
 <dt class="sig sig-object py" id="pubcheck.base.Budget">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">Budget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>One deadline shared by every lookup of a check.</p>
+<p>One deadline shared by every lookup of a check, and a record of what each lookup cost.</p>
+<p><code class="docutils literal notranslate"><span class="pre">lookups</span></code> holds <code class="docutils literal notranslate"><span class="pre">(label,</span> <span class="pre">seconds,</span> <span class="pre">outcome)</span></code> per lookup, <code class="docutils literal notranslate"><span class="pre">outcome</span></code> one of <code class="docutils literal notranslate"><span class="pre">ok</span></code>,
+<code class="docutils literal notranslate"><span class="pre">failed</span></code>, <code class="docutils literal notranslate"><span class="pre">timeout</span></code> or <code class="docutils literal notranslate"><span class="pre">skipped</span></code> (no time left); the label is the program’s
+name only, never an argument (one could carry a path or the text).</p>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
@@ -222,11 +239,33 @@ override’s reason as its author wrote it.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pubcheck.base.Budget.report">
+<span class="sig-name descname"><span class="pre">report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.report" title="Link to this definition">#</a></dt>
+<dd><p>The lookups as JSON-ready rows <code class="docutils literal notranslate"><span class="pre">[label,</span> <span class="pre">seconds,</span> <span class="pre">outcome]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pubcheck.base.Budget.run">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cwd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pubcheck/base.html#Budget.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pubcheck.base.Budget.run" title="Link to this definition">#</a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">subprocess.run</span></code> within the budget; <code class="docutils literal notranslate"><span class="pre">None</span></code> when out of time or on failure.</p>
+<p>The lookup runs in its own process group, and running out of time kills the whole
+group: a program that started helpers of its own leaves none behind, still holding
+the machine, once the check has given up on it. The trade-off: a caller that kills the check
+itself (rather than giving it a <code class="docutils literal notranslate"><span class="pre">--deadline</span></code>) does not reach a lookup in flight,
+which runs on until its own end.</p>
 <dl class="field-list simple">
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pubcheck.base.Budget.strained">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">strained</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><span class="pre">bool</span></a></span><a class="headerlink" href="#pubcheck.base.Budget.strained" title="Link to this definition">#</a></dt>
+<dd><p>Whether a lookup ran out of time or was skipped for lack of it.</p>
 </dd></dl>
 
 </dd></dl>
@@ -252,6 +291,19 @@ credential patterns, e.g. <code class="docutils literal notranslate"><span class
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.base.FINISH_RESERVE">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">FINISH_RESERVE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></span><a class="headerlink" href="#pubcheck.base.FINISH_RESERVE" title="Link to this definition">#</a></dt>
+<dd><p>Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a
+caller that kills it at its deadline gets an answer instead.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.base.REAP_SECONDS">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">REAP_SECONDS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></span><a class="headerlink" href="#pubcheck.base.REAP_SECONDS" title="Link to this definition">#</a></dt>
+<dd><p>Seconds to reap a killed lookup (its pipes may be held by a process outside its group).</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="pubcheck.base.SETTINGS_ENV">
 <span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">SETTINGS_ENV</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'budget_seconds':</span> <span class="pre">'PUBCHECK_BUDGET_SECONDS',</span> <span class="pre">'credential_scanner':</span> <span class="pre">'PUBCHECK_CREDENTIAL_SCANNER',</span> <span class="pre">'hold_label':</span> <span class="pre">'PUBCHECK_HOLD_LABEL',</span> <span class="pre">'hold_repo':</span> <span class="pre">'PUBCHECK_HOLD_REPO',</span> <span class="pre">'private_issues':</span> <span class="pre">'PUBCHECK_PRIVATE_ISSUES',</span> <span class="pre">'private_owner':</span> <span class="pre">'PUBCHECK_PRIVATE_OWNER'}</span></span><a class="headerlink" href="#pubcheck.base.SETTINGS_ENV" title="Link to this definition">#</a></dt>
 <dd><p>config only).</p>
@@ -260,6 +312,12 @@ credential patterns, e.g. <code class="docutils literal notranslate"><span class
 <dd class="field-odd"><p>The environment variable that overrides each setting (<code class="docutils literal notranslate"><span class="pre">private_patterns</span></code></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="pubcheck.base.SLOW_CHECK">
+<span class="sig-prename descclassname"><span class="pre">pubcheck.base.</span></span><span class="sig-name descname"><span class="pre">SLOW_CHECK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.0</span></span><a class="headerlink" href="#pubcheck.base.SLOW_CHECK" title="Link to this definition">#</a></dt>
+<dd><p>A check slower than this (seconds) logs what its lookups cost, to find the slow one.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -363,7 +421,7 @@ credential patterns, e.g. <code class="docutils literal notranslate"><span class
     </div>
   </div>
 </footer>
-      <script src="../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../_static/documentation_options.js?v=47de8214"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
