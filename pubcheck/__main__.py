@@ -7,6 +7,12 @@ post goes out: @mentions are held, and a missing registry or any failure is ``un
 ``--hold TARGET`` (unattended) also files a held post as a desk item and adds its URL to
 the JSON as ``desk_item``.
 
+``--budget`` is counted from the moment the command starts, and ``--deadline`` (a Unix
+time, ``time.time()``) is the moment its caller gives up; the lookups stop
+``FINISH_RESERVE`` seconds before the earlier of the two, so the command answers even on
+a loaded machine, where starting Python alone can take seconds. A caller that kills the
+command at a deadline should pass it: only the caller knows when it started waiting.
+
 Usage from a script::
 
     printf '%s' "$BODY" | public-text-guard check --repo octo/app --unattended
@@ -17,6 +23,32 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
+
+_STARTED = time.monotonic()  # as early as the command can tell: its budget starts here
+
+
+def effective_budget(budget, deadline=None, *, started, reserve=None, default=None):
+    """Seconds the lookups may take: what is left of ``budget`` since ``started`` and
+    before ``deadline`` (Unix time), less ``reserve``; never negative.
+
+    >>> now = time.monotonic()
+    >>> effective_budget(10, started=now, reserve=1) <= 9
+    True
+    >>> effective_budget(10, time.time() + 3, started=now, reserve=1) <= 2
+    True
+    >>> effective_budget(10, time.time() - 5, started=now, reserve=1)
+    0.0
+    """
+    from pubcheck.base import FINISH_RESERVE, settings
+
+    reserve = FINISH_RESERVE if reserve is None else reserve
+    if budget is None:
+        budget = default if default is not None else settings()["budget_seconds"]
+    left = budget - (time.monotonic() - started)
+    if deadline is not None:
+        left = min(left, deadline - time.time())
+    return max(left - reserve, 0.0)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -57,7 +89,16 @@ def _parser() -> argparse.ArgumentParser:
         metavar="TARGET",
         help="on a hold, file a desk item for TARGET (e.g. github:o/r)",
     )
-    c.add_argument("--budget", type=float, help="seconds for every lookup together")
+    c.add_argument(
+        "--budget",
+        type=float,
+        help="seconds for the whole check, from the command's start",
+    )
+    c.add_argument(
+        "--deadline",
+        type=float,
+        help="Unix time at which the caller gives up; the check answers before it",
+    )
     c.add_argument("--session", help="a session id for the log")
     return p
 
@@ -78,7 +119,7 @@ def main(argv=None) -> int:
             public=True if args.public else None,
             surface=args.surface,
             override=args.override,
-            budget=args.budget,
+            budget=effective_budget(args.budget, args.deadline, started=_STARTED),
             writer="cli",
             context={"session": args.session} if args.session else None,
         )

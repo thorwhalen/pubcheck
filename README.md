@@ -31,7 +31,7 @@ An attended writer (an agent session someone is driving) proceeds without the re
 ## Three ways in, one check
 
 - **Python**: `pubcheck.check(text, repo=..., title=..., unattended=...)` returns a `Verdict`.
-- **CLI**: `public-text-guard check --repo OWNER/REPO [--unattended] [--title T] [--hold TARGET] [--terms]`, the text on stdin. `--terms` adds the matched terms, for a local author who has to reword; `--hold` files a held post as a desk item.
+- **CLI**: `public-text-guard check --repo OWNER/REPO [--unattended] [--title T] [--hold TARGET] [--terms]`, the text on stdin. `--terms` adds the matched terms, for a local author who has to reword; `--hold` files a held post as a desk item. `--deadline UNIX_TIME` is when the caller gives up (a hook that kills the command at a timeout passes it): the check counts its budget from its own start and answers a second before the earlier of the two, so a loaded machine gets a verdict instead of a killed process. A check that ran out of time, or took over 3 s, logs what each lookup cost (`slow_check`, program names and seconds only).
 - **correspond**: at the top of `~/.config/correspond/config.toml`, `before_send = "pubcheck.correspond:before_send"`. Every write to a public audience is checked unattended; a held one raises correspond's `NeedsApproval` with the categories, and on a real send (not a dry run) becomes a desk item.
 
 ## Held posts become desk items
