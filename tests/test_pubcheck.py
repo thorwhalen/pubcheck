@@ -567,3 +567,114 @@ def test_the_scanner_is_a_setting_with_an_environment_override(monkeypatch):
     assert settings()["credential_scanner"] is None
     monkeypatch.setenv("PUBCHECK_CREDENTIAL_SCANNER", "betterleaks")
     assert settings()["credential_scanner"] == "betterleaks"
+
+
+# ---- the budget holds on a loaded machine (a caller that kills the check gets no answer) ----
+
+
+def slow_gh(env, *, seconds=30, pidfile=None):
+    """A ``gh`` that hangs, with a helper of its own that would outlive it."""
+    script = env.bin / "gh"
+    helper = f"sleep {seconds} & echo $! > {pidfile}; " if pidfile else ""
+    script.write_text(f"#!/bin/sh\n{helper}sleep {seconds}\n")
+    script.chmod(0o755)
+
+
+def _alive(pid):
+    """Running, not a zombie (a container's PID 1 may never reap it)."""
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    stat = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True).stdout
+    return bool(stat.strip()) and not stat.strip().startswith("Z")
+
+
+def test_a_lookup_out_of_time_is_cut_with_its_helpers(env, tmp_path):
+    from pubcheck.base import Budget
+
+    pidfile = tmp_path / "helper.pid"
+    slow_gh(env, pidfile=pidfile)
+    b = Budget(10)
+    started = time.monotonic()
+    assert b.run([str(env.bin / "gh"), "repo", "view"], cap=1) is None
+    assert time.monotonic() - started < 4
+    ((label, _, outcome),) = b.lookups
+    assert (label, outcome) == ("gh", "timeout")
+    for _ in range(50):  # a loaded runner may not have written it within the cap
+        if pidfile.exists() and pidfile.read_text().strip():
+            break
+        time.sleep(0.05)
+    else:
+        pytest.skip("the fake gh never started its helper on this runner")
+    helper = int(pidfile.read_text())
+    for _ in range(50):  # the kill is sent; the helper may take a moment to go
+        if not _alive(helper):
+            break
+        time.sleep(0.05)
+    assert not _alive(helper)
+
+
+def test_lookups_are_recorded_without_their_arguments(env):
+    from pubcheck.base import Budget
+
+    b = Budget(5)
+    assert b.run(["/bin/echo", "hello"]).stdout == "hello\n"
+    b.deadline = time.monotonic() - 1
+    assert b.run(["git", "-C", "/some/private/path", "remote"]) is None
+    assert b.report() == [["echo", b.report()[0][1], "ok"], ["git", 0.0, "skipped"]]
+    assert b.strained
+
+
+def test_a_strained_check_logs_what_its_lookups_cost(env):
+    slow_gh(env)
+    started = time.monotonic()
+    v = check("Ada Quill", repo="nobody/new", budget=1)
+    assert time.monotonic() - started < 4
+    assert v.decision == "flag"  # unknown is public: decided, not killed
+    slow = [e for e in env.events() if e.get("event") == "slow_check"]
+    assert len(slow) == 1 and ["gh", "timeout"] == [slow[0]["lookups"][0][0], slow[0]["lookups"][0][2]]
+    assert "Ada" not in json.dumps(slow)
+
+
+def test_a_quick_check_logs_no_timing(env):
+    check("A neutral note.", repo=PUBLIC)
+    assert not [e for e in env.events() if e.get("event") == "slow_check"]
+
+
+def test_cli_answers_before_the_callers_deadline(env, tmp_path):
+    slow_gh(env)
+    started = time.time()
+    r = subprocess.run(
+        [sys.executable, "-m", "pubcheck", "check", "--repo", "nobody/new", "--terms",
+         "--budget", "20", "--deadline", str(started + 3)],
+        input="A neutral note.", capture_output=True, text=True, timeout=30, env=os.environ,
+    )
+    assert time.time() - started < 3
+    assert json.loads(r.stdout)["decision"] == "pass"
+
+
+def test_cli_budget_counts_its_own_start(monkeypatch):
+    from pubcheck.__main__ import effective_budget
+
+    assert effective_budget(5, started=time.monotonic() - 3, reserve=1) <= 1
+    assert effective_budget(5, time.time() - 1, started=time.monotonic(), reserve=0) == 0.0
+
+
+def test_explain_says_private_for_a_private_pass(env):
+    v = check("Ada Quill", repo=PRIVATE)
+    assert v.decision == "pass" and v.to_json(terms=True)["explain"] == f"{PRIVATE} is private: nothing is scanned."
+    assert check("A neutral note.", repo=PUBLIC).explain() == "Nothing found."
+
+
+def test_explain_names_a_registry_gap(env, monkeypatch):
+    monkeypatch.setenv(s.VOCAB_FILE_ENV, str(env.root / "missing.json"))
+    v = check("A neutral note.", repo=PUBLIC)
+    assert v.registry == "unavailable" and "names were not checked" in v.explain()
+
+
+def test_a_context_key_cannot_break_the_slow_log(env):
+    slow_gh(env)  # present, so the lookup is skipped for time and the slow log is written
+    v = check("Ada Quill", repo="nobody/new", budget=0, context={"seconds": 1, "event": "x"})
+    assert v.decision == "flag"
+    assert [e for e in env.events() if e.get("event") == "slow_check"]

@@ -29,7 +29,9 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
-from pubcheck.base import MAX_TEXT, Budget, log_event, settings, text_hash
+import time
+
+from pubcheck.base import MAX_TEXT, SLOW_CHECK, Budget, log_event, settings, text_hash
 from pubcheck.detectors import (
     DETECTORS,
     UNATTENDED_DETECTORS,
@@ -111,6 +113,12 @@ class Verdict:
         """For the author: what was found, by category, and where the private context goes."""
         if self.decision == "unavailable":
             return f"The publication check could not be made ({self.reason}), so nothing is published."
+        if not self.findings:
+            if self.visibility == "private":
+                return f"{self.repo} is private: nothing is scanned."
+            if self.registry == "unavailable":
+                return "Nothing found (the name registry was unavailable, so names were not checked)."
+            return "Nothing found."
         lines = [
             f"{self.repo or 'an unknown (so presumed public) repo'} is public, and the text:"
         ]
@@ -180,13 +188,66 @@ def check(
     "private" (a repo made public today must not pass unscanned), and holds a text longer
     than ``MAX_TEXT`` as unavailable.
     """
+    started = time.monotonic()
+    conf = settings({"budget_seconds": budget})
+    b = Budget(conf["budget_seconds"])
+    verdict = _judge(
+        text,
+        b=b,
+        conf=conf,
+        repo=repo,
+        title=title,
+        more=more,
+        unattended=unattended,
+        public=public,
+        surface=surface,
+        override=override,
+        repo_dir=repo_dir,
+        detectors=detectors,
+        writer=writer,
+        log=log,
+        context=context,
+    )
+    elapsed = time.monotonic() - started
+    _SLOW_KEYS = {"writer", "event", "surface", "repo", "decision", "seconds", "budget", "lookups"}
+    if log and (b.strained or elapsed > SLOW_CHECK):
+        log_event(
+            writer=writer,
+            event="slow_check",
+            surface=surface,
+            repo=verdict.repo,
+            decision=verdict.decision,
+            seconds=round(elapsed, 2),
+            budget=conf["budget_seconds"],
+            lookups=b.report(),
+            **{k: v for k, v in (context or {}).items() if k not in _SLOW_KEYS},
+        )
+    return verdict
+
+
+def _judge(
+    text,
+    *,
+    b: Budget,
+    conf: Mapping,
+    repo,
+    title,
+    more,
+    unattended,
+    public,
+    surface,
+    override,
+    repo_dir,
+    detectors,
+    writer,
+    log,
+    context,
+) -> Verdict:
+    """:func:`check`'s decision, its lookups inside ``b``."""
     texts = [t for t in (title, text, *more) if t]
     verdict = Verdict(
         "pass", repo=repo or "", unattended=unattended, text_hash=text_hash(*texts)
     )
-    conf = settings({"budget_seconds": budget})
-    b = Budget(conf["budget_seconds"])
-
     def logged(decision_name, **extra):
         if log:
             log_event(

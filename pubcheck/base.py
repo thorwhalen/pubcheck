@@ -25,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import signal
 import subprocess
 import time
 from collections.abc import Mapping
@@ -35,6 +36,13 @@ import tomllib
 BUDGET_SECONDS = 12.0
 MAX_TEXT = 70_000  # characters; GitHub caps a body at 65,536, and longer is not checked
 LOOKUP_TIMEOUT = 8.0
+#: Seconds a check keeps for itself after its lookups (deciding, logging, exiting), so a
+#: caller that kills it at its deadline gets an answer instead.
+FINISH_RESERVE = 1.0
+#: A check slower than this (seconds) logs what its lookups cost, to find the slow one.
+SLOW_CHECK = 3.0
+#: Seconds to reap a killed lookup (its pipes may be held by a process outside its group).
+REAP_SECONDS = 0.2
 CACHE_DIR_ENV = "PUBLIC_TEXT_GUARD_CACHE_DIR"
 CACHE_DIR = "~/.cache/public-text-guard"
 STATE_DIR_ENV = "PUBLIC_TEXT_GUARD_STATE_DIR"
@@ -77,10 +85,16 @@ SETTINGS_ENV = {
 
 
 class Budget:
-    """One deadline shared by every lookup of a check."""
+    """One deadline shared by every lookup of a check, and a record of what each lookup cost.
+
+    ``lookups`` holds ``(label, seconds, outcome)`` per lookup, ``outcome`` one of ``ok``,
+    ``failed``, ``timeout`` or ``skipped`` (no time left); the label is the program's
+    name only, never an argument (one could carry a path or the text).
+    """
 
     def __init__(self, seconds: float | None = BUDGET_SECONDS):
         self.deadline = None if seconds is None else time.monotonic() + seconds
+        self.lookups: list[tuple[str, float, str]] = []
 
     def left(self, cap: float = LOOKUP_TIMEOUT) -> float:
         """Seconds a lookup may take: ``cap``, or what is left of the budget when less."""
@@ -97,22 +111,79 @@ class Budget:
         env: Mapping | None = None,
         cwd: str | None = None,
     ):
-        """``subprocess.run`` within the budget; ``None`` when out of time or on failure."""
+        """``subprocess.run`` within the budget; ``None`` when out of time or on failure.
+
+        The lookup runs in its own process group, and running out of time kills the whole
+        group: a program that started helpers of its own leaves none behind, still holding
+        the machine, once the check has given up on it. The trade-off: a caller that kills the check
+        itself (rather than giving it a ``--deadline``) does not reach a lookup in flight,
+        which runs on until its own end.
+        """
+        label = _lookup_label(argv)
         left = self.left(cap)
         if left <= 0.05:
+            self.lookups.append((label, 0.0, "skipped"))
             return None
+        started = time.monotonic()
+
+        def note(outcome):
+            self.lookups.append((label, round(time.monotonic() - started, 2), outcome))
+
         try:
-            return subprocess.run(
+            proc = subprocess.Popen(
                 argv,
-                capture_output=True,
+                stdin=subprocess.DEVNULL if stdin is None else subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=left,
-                input=stdin,
                 env=env,
                 cwd=cwd,
+                start_new_session=True,
             )
-        except (OSError, subprocess.SubprocessError):
+        except (OSError, ValueError, subprocess.SubprocessError):
+            note("failed")
             return None
+        try:
+            out, err = proc.communicate(stdin, timeout=left)
+        except subprocess.TimeoutExpired:
+            _kill_group(proc)
+            note("timeout")
+            return None
+        except (OSError, ValueError, subprocess.SubprocessError):
+            _kill_group(proc)
+            note("failed")
+            return None
+        note("ok")
+        return subprocess.CompletedProcess(argv, proc.returncode, out, err)
+
+    def report(self) -> list[list]:
+        """The lookups as JSON-ready rows ``[label, seconds, outcome]``."""
+        return [list(row) for row in self.lookups]
+
+    @property
+    def strained(self) -> bool:
+        """Whether a lookup ran out of time or was skipped for lack of it."""
+        return any(outcome in ("timeout", "skipped") for _, _, outcome in self.lookups)
+
+
+def _lookup_label(argv) -> str:
+    """``gh``, ``acquaint``, ``git``: the program's name only, as an argument may be a path."""
+    return Path(str(argv[0])).name if len(argv) else "?"
+
+
+def _kill_group(proc) -> None:
+    """Kill ``proc`` and every process of its group, then reap it; never raises."""
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except OSError:
+        try:
+            proc.kill()
+        except OSError:
+            pass
+    try:
+        proc.communicate(timeout=REAP_SECONDS)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        pass
 
 
 def write_private(path, text: str, *, append: bool = False) -> None:
